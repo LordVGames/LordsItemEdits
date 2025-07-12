@@ -1,0 +1,349 @@
+﻿using MiscFixes.Modules;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using RoR2;
+using RoR2.CharacterAI;
+using RoR2.ContentManagement;
+using RoR2.Items;
+using RoR2BepInExPack.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
+using static UnityEngine.Object;
+
+namespace LordsItemEdits.ItemEdits
+{
+    internal class VoidDios
+    {
+        private static AssetReferenceT<ItemDef> _voidDiosItemAssetReference;
+        private static AssetReferenceT<ItemDef> _cutHpItemDefAssetReference;
+        private static ItemDef _cutHpItemDef;
+
+        private static AssetReferenceT<GameObject> _reaverAllyMasterPrefabReference;
+        private static GameObject _reaverAllyMasterPrefab;
+        private static AssetReferenceT<GameObject> _reaverAllyBodyPrefabReference;
+        //private static GameObject _reaverAllyBodyPrefab;
+
+        private static AssetReferenceT<GameObject> _jailerAllyMasterPrefabReference;
+        private static GameObject _jailerAllyMasterPrefab;
+        private static AssetReferenceT<GameObject> _jailerAllyBodyPrefabReference;
+        //private static GameObject _jailerAllyBodyPrefab;
+
+        private static AssetReferenceT<GameObject> _devastatorAllyMasterPrefabReference;
+        private static GameObject _devastatorAllyMasterPrefab;
+        private static AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference;
+        //private static GameObject _devastatorAllyBodyPrefab;
+        private static readonly FixedConditionalWeakTable<CharacterMaster, LieVoidDiosInfo> _lieVoidDiosTable = [];
+        private class LieVoidDiosInfo
+        {
+            internal GameObject OriginalBodyPrefab;
+        }
+
+
+
+        internal static void Setup()
+        {
+            if (!ConfigOptions.EnableVoidDiosEdit.Value)
+            {
+                return;
+            }
+
+            LoadAssetReferences();
+            AssignPrefabs();
+            EditAllOtherVoidAssets();
+            IL.RoR2.Items.ExtraLifeVoidManager.Init += ExtraLifeVoidManager_Init;
+            IL.RoR2.CharacterMaster.RespawnExtraLifeVoid += CharacterMaster_RespawnExtraLifeVoid;
+            On.RoR2.CharacterBody.Start += CharacterBody_Start;
+        }
+
+
+
+        private static void LoadAssetReferences()
+        {
+            _voidDiosItemAssetReference = new AssetReferenceT<ItemDef>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_ExtraLifeVoid.ExtraLifeVoid_asset);
+            _cutHpItemDefAssetReference = new AssetReferenceT<ItemDef>(RoR2BepInExPack.GameAssetPaths.RoR2_Base_CutHp.CutHp_asset);
+
+            _reaverAllyBodyPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyBody_prefab);
+            _reaverAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyMaster_prefab);
+
+            _jailerAllyBodyPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyBody_prefab);
+            _jailerAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyMaster_prefab);
+
+            _devastatorAllyBodyPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
+            _devastatorAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
+        }
+
+        private static void AssignPrefabs()
+        {
+            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_cutHpItemDefAssetReference).Completed += (handle) =>
+            {
+                _cutHpItemDef = handle.Result;
+                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_voidDiosItemAssetReference);
+            };
+
+
+
+            AssetAsyncReferenceManager<GameObject>.LoadAsset(_reaverAllyMasterPrefabReference).Completed += (handle) =>
+            {
+                _reaverAllyMasterPrefab = handle.Result;
+                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_reaverAllyMasterPrefabReference);
+            };
+
+            AssetAsyncReferenceManager<GameObject>.LoadAsset(_jailerAllyMasterPrefabReference).Completed += (handle) =>
+            {
+                _jailerAllyMasterPrefab = handle.Result;
+                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_jailerAllyMasterPrefabReference);
+            };
+
+            AssetAsyncReferenceManager<GameObject>.LoadAsset(_devastatorAllyMasterPrefabReference).Completed += (handle) =>
+            {
+                _devastatorAllyMasterPrefab = handle.Result;
+                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_devastatorAllyMasterPrefabReference);
+            };
+        }
+
+        private static void EditAllOtherVoidAssets()
+        {
+            // no way i'm letting engi turrets get this new void dios lmao
+            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_voidDiosItemAssetReference).Completed += (handle) =>
+            {
+                ItemDef voidDiosItemDef = handle.Result;
+                voidDiosItemDef.tags = [.. voidDiosItemDef.tags, ItemTag.CannotCopy];
+                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_voidDiosItemAssetReference);
+            };
+
+
+
+            // void allies are playable now so i need to increase all of their interaction ranges since they can't reach anything normally
+            AssetAsyncReferenceManager<GameObject>.LoadAsset(_reaverAllyBodyPrefabReference).Completed += (handle) =>
+            {
+                Interactor reaverAllyInteractor = handle.Result.GetComponent<Interactor>();
+                reaverAllyInteractor.maxInteractionDistance = 9;
+                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_reaverAllyBodyPrefabReference);
+            };
+
+            AssetAsyncReferenceManager<GameObject>.LoadAsset(_jailerAllyBodyPrefabReference).Completed += (handle) =>
+            {
+                Interactor jailerAllyInteractor = handle.Result.GetComponent<Interactor>();
+                jailerAllyInteractor.maxInteractionDistance = 12;
+                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_jailerAllyBodyPrefabReference);
+            };
+
+            AssetAsyncReferenceManager<GameObject>.LoadAsset(_devastatorAllyBodyPrefabReference).Completed += (handle) =>
+            {
+                Interactor devastatorAllyInteractor = handle.Result.GetComponent<Interactor>();
+                devastatorAllyInteractor.maxInteractionDistance = 15;
+                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_devastatorAllyBodyPrefabReference);
+            };
+        }
+
+
+
+        private static void ExtraLifeVoidManager_Init(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            if (!c.TryGotoNext(MoveType.After,
+                x => x.MatchStsfld("RoR2.Items.ExtraLifeVoidManager", "voidBodyNames")
+            ))
+            {
+                Util.LogILError(il, c);
+                return;
+            }
+
+            // i could surgically replace/insert strings when the array's created but i can't be bothered to do that
+            c.EmitDelegate<Action>(() =>
+            {
+                if (ConfigOptions.AllowRespawnAsVoidReaver.Value)
+                {
+                    ExtraLifeVoidManager.voidBodyNames = ["NullifierAllyBody", "VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
+                }
+                else
+                {
+                    ExtraLifeVoidManager.voidBodyNames = ["VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
+                }
+            });
+        }
+
+        private static void CharacterMaster_RespawnExtraLifeVoid(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            // go before respawn line
+            if (!c.TryGotoNext(MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdloc(0),
+                x => x.MatchLdcR4(0)
+            ))
+            {
+                Util.LogILError(il, c);
+                return;
+            }
+            c.Emit(OpCodes.Ldarg_0);
+            c.EmitDelegate<Action<CharacterMaster>>((characterMaster) =>
+            {
+                if (!_lieVoidDiosTable.TryGetValue(characterMaster, out _))
+                {
+                    _lieVoidDiosTable.Add(characterMaster, new LieVoidDiosInfo { OriginalBodyPrefab = characterMaster.bodyPrefab });
+                    characterMaster.inventory?.GiveItem(_cutHpItemDef.itemIndex);
+                }
+                BaseAI originalBaseAI = characterMaster.GetComponent<BaseAI>();
+                GameObject voidAllyBodyPrefab = ExtraLifeVoidManager.GetNextBodyPrefab(); // the method to pick a void guy to respawn as is still there, just unused
+                GameObject voidAllyMasterPrefab = GetVoidAllyMasterPrefabFromBodyPrefab(voidAllyBodyPrefab);
+
+
+                characterMaster.bodyPrefab = voidAllyBodyPrefab;
+                if (originalBaseAI != null && voidAllyMasterPrefab != null)
+                {
+                    ReplaceAISkillDrivers(characterMaster, originalBaseAI, voidAllyMasterPrefab); // fixes the ai being lobotomized since the ai doesn't change with their body
+                }
+            });
+
+
+
+
+            ILLabel skipItemVoiding = c.DefineLabel();
+
+            // go before foreach line
+            if (!c.TryGotoNext(MoveType.AfterLabel,
+                x => x.MatchLdloca(4),
+                x => x.MatchCall(out _),
+                x => x.MatchStloc(5)
+            ))
+            {
+                Util.LogILError(il, c);
+                return;
+            }
+            c.Emit(OpCodes.Br, skipItemVoiding);
+
+            // go to the end of the foreach block
+            if (!c.TryGotoNext(MoveType.After,
+                x => x.MatchCallvirt<IDisposable>("Dispose"),
+                x => x.MatchEndfinally()
+            ))
+            {
+                Util.LogILError(il, c);
+                return;
+            }
+            c.MarkLabel(skipItemVoiding);
+        }
+
+        #region separate CharacterBody_Start region because collapsing it collapses everything below it for some reason
+        private static void CharacterBody_Start(On.RoR2.CharacterBody.orig_Start orig, CharacterBody self)
+        {
+            if (self == null || self.master == null)
+            {
+                orig(self);
+                return;
+            }
+            if (!_lieVoidDiosTable.TryGetValue(self.master, out var lieVoidDiosInfo))
+            {
+                orig(self);
+                return;
+            }
+
+
+            self.master.bodyPrefab = lieVoidDiosInfo.OriginalBodyPrefab;
+            _lieVoidDiosTable.Remove(self.master);
+            if (self.master.inventory != null)
+            {
+                if (self.master.inventory.GetItemCount(_cutHpItemDef.itemIndex) > 0)
+                {
+                    Log.Info($"Removing a CutHp from CharacterBody {self.name} that is Start-ing since they have a lieVoidDiosInfo");
+                    self.master.inventory.RemoveItem(_cutHpItemDef.itemIndex);
+                }
+            }
+            else
+            {
+                Log.Error("SELF MASTER INVENTORY IN CharacterBody_Start WAS NULL!!!!! NOT GOOOD");
+            }
+
+
+            orig(self);
+        }
+        #endregion
+
+
+
+        private static GameObject GetVoidAllyMasterPrefabFromBodyPrefab(GameObject voidAllyBodyPrefab)
+        {
+            GameObject masterPrefab;
+            switch (voidAllyBodyPrefab.name)
+            {
+                case "NullifierAllyBody":
+                    masterPrefab = _reaverAllyMasterPrefab;
+                    break;
+                case "VoidJailerAllyBody":
+                    masterPrefab = _jailerAllyMasterPrefab;
+                    break;
+                case "VoidMegaCrabAllyBody":
+                    masterPrefab = _devastatorAllyMasterPrefab;
+                    break;
+                default:
+                    Log.Error("Could not get master prefab for void ally body! This really shouldn't happen ever!");
+                    return null;
+            }
+            return masterPrefab;
+        }
+
+        // from DestroyedClone's TransformingAIFix/TransformingFix
+        private static void ReplaceAISkillDrivers(CharacterMaster characterMaster, BaseAI baseAI, GameObject newCharacterMasterPrefab)
+        {
+            //Chat.AddMessage($"{characterMaster.name} has transformed into {newCharacterMasterPrefab.name}");
+            foreach (var skillDriver in characterMaster.GetComponents<AISkillDriver>())
+            {
+                Destroy(skillDriver);
+            }
+            AISkillDriver[] listOfPrefabDrivers = newCharacterMasterPrefab.GetComponents<AISkillDriver>();
+            List<AISkillDriver> newSkillDrivers = [];
+
+            foreach (var skillDriver in listOfPrefabDrivers)
+            {
+                var newDriver = characterMaster.gameObject.AddComponent<AISkillDriver>();
+                newDriver.activationRequiresAimConfirmation = skillDriver.activationRequiresAimConfirmation;
+                newDriver.activationRequiresAimTargetLoS = skillDriver.activationRequiresAimTargetLoS;
+                newDriver.activationRequiresTargetLoS = skillDriver.activationRequiresTargetLoS;
+                newDriver.aimType = skillDriver.aimType;
+                newDriver.buttonPressType = skillDriver.buttonPressType;
+                newDriver.customName = skillDriver.customName;
+                newDriver.driverUpdateTimerOverride = skillDriver.driverUpdateTimerOverride;
+                newDriver.ignoreNodeGraph = skillDriver.ignoreNodeGraph;
+                newDriver.maxDistance = skillDriver.maxDistance;
+                newDriver.maxTargetHealthFraction = skillDriver.maxTargetHealthFraction;
+                newDriver.maxUserHealthFraction = skillDriver.maxUserHealthFraction;
+                newDriver.minDistance = skillDriver.minDistance;
+                newDriver.minTargetHealthFraction = skillDriver.minTargetHealthFraction;
+                newDriver.minUserHealthFraction = skillDriver.minUserHealthFraction;
+                newDriver.moveInputScale = skillDriver.moveInputScale;
+                newDriver.movementType = skillDriver.movementType;
+                newDriver.moveTargetType = skillDriver.moveTargetType;
+                newDriver.nextHighPriorityOverride = skillDriver.nextHighPriorityOverride;
+                newDriver.noRepeat = skillDriver.noRepeat;
+                newDriver.requiredSkill = skillDriver.requiredSkill;
+                newDriver.requireEquipmentReady = skillDriver.requireEquipmentReady;
+                newDriver.requireSkillReady = skillDriver.requireSkillReady;
+                newDriver.resetCurrentEnemyOnNextDriverSelection = skillDriver.resetCurrentEnemyOnNextDriverSelection;
+                newDriver.selectionRequiresAimTarget = skillDriver.selectionRequiresAimTarget;
+                newDriver.selectionRequiresOnGround = skillDriver.selectionRequiresOnGround;
+                newDriver.selectionRequiresTargetLoS = skillDriver.selectionRequiresTargetLoS;
+                newDriver.shouldFireEquipment = skillDriver.shouldFireEquipment;
+                newDriver.shouldSprint = skillDriver.shouldSprint;
+                newDriver.buttonPressType = skillDriver.buttonPressType;
+                newDriver.skillSlot = skillDriver.skillSlot;
+                newDriver.name = $"{skillDriver.name}(Clone)"; // keeping things the same as if it was spawned in
+                newSkillDrivers.Add(newDriver);
+            }
+            AISkillDriver[] array = [.. newSkillDrivers];
+            baseAI.skillDrivers = array;
+
+            EntityStateMachine esm = characterMaster.GetComponent<EntityStateMachine>();
+            EntityStateMachine customESM = newCharacterMasterPrefab.GetComponent<EntityStateMachine>();
+            esm.customName = customESM.customName;
+            esm.initialStateType = customESM.initialStateType;
+            esm.mainStateType = customESM.mainStateType;
+            esm.nextState = customESM.nextState;
+        }
+    }
+}

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BepInEx.Configuration;
+using MiscFixes.Modules;
 
 namespace LordsItemEdits
 {
@@ -12,15 +13,18 @@ namespace LordsItemEdits
 
         internal static void BindConfigOptions(ConfigFile config)
         {
-            EnableVoidDiosEdit = config.Bind<bool>(
+            EnableVoidDiosEdit = config.BindOption(
                 "Pluripotent Larva",
-                "Enable edit", true,
-                "Enable the Pluripotent Larva edit?"
+                "Enable edit",
+                "Enable the Pluripotent Larva edit?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
             );
-            AllowRespawnAsVoidReaver = config.Bind<bool>(
+            AllowRespawnAsVoidReaver = config.BindOption(
                 "Pluripotent Larva",
-                "Allow respawning as a Void Reaver", false,
-                "Should the Void Reaver be an option to respawn as with the edited Pluripotent Larva? This is configurable since their only attack has bad damage and can't target flying enemies."
+                "Allow respawning as a Void Reaver",
+                "Should the Void Reaver be an option to respawn as with the edited Pluripotent Larva? This is configurable since their only attack has bad damage and can't target flying enemies.",
+                false
             );
         }
     }

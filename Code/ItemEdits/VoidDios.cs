@@ -16,7 +16,7 @@ using static UnityEngine.Object;
 
 namespace LordsItemEdits.ItemEdits
 {
-    internal class VoidDios
+    internal static class VoidDios
     {
         private static AssetReferenceT<ItemDef> _voidDiosItemAssetReference;
         private static AssetReferenceT<ItemDef> _cutHpItemDefAssetReference;

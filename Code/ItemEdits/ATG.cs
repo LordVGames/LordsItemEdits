@@ -14,7 +14,7 @@ using static UnityEngine.Object;
 
 namespace LordsItemEdits.ItemEdits
 {
-    internal class ATG
+    internal static class ATG
     {
         private static readonly ItemDef nullItemDef = null;
         private const float initialDamageCoefficient = 3f;
@@ -114,12 +114,10 @@ namespace LordsItemEdits.ItemEdits
             float damageValue = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, damageCoefficient);
 
             // can implement the icbm change for atg here since we're re-implementing atg rn anyways
-            // TODO replace this with icbm mult grabber variable when it's added
-            // TODO this also doesn't work????
             int icbmCount = attackerBody.inventory.GetItemCount(DLC1Content.Items.MoreMissile);
-            if (icbmCount > 1)
+            if (icbmCount > 0)
             {
-                damageValue *= 3f + (1.5f * (icbmCount - 1));
+                damageValue *= PocketICBM.GetICBMDamageMult(icbmCount);
             }
 
             MicroMissileOrb missileOrb = new()

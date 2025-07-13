@@ -20,6 +20,7 @@ namespace LordsItemEdits
             ConfigOptions.BindConfigOptions(Config);
 
             ItemEdits.VoidDios.Setup();
+            ItemEdits.ATG.Setup();
         }
     }
 }

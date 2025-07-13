@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.SceneManagement;
 using static UnityEngine.Object;
 
 namespace LordsItemEdits.ItemEdits
@@ -39,6 +40,7 @@ namespace LordsItemEdits.ItemEdits
         private class LieVoidDiosInfo
         {
             internal GameObject OriginalBodyPrefab;
+            internal string NameOfSceneFirstRevivedIn;
         }
 
 
@@ -51,14 +53,13 @@ namespace LordsItemEdits.ItemEdits
             }
 
             LoadAssetReferences();
-            AssignPrefabs();
-            EditAllOtherVoidAssets();
+            AssignMasterPrefabs();
+            EditVoidBodyPrefabs();
+            EditItemPrefabs();
             IL.RoR2.Items.ExtraLifeVoidManager.Init += ExtraLifeVoidManager_Init;
             IL.RoR2.CharacterMaster.RespawnExtraLifeVoid += CharacterMaster_RespawnExtraLifeVoid;
             On.RoR2.CharacterBody.Start += CharacterBody_Start;
         }
-
-
 
         private static void LoadAssetReferences()
         {
@@ -75,16 +76,8 @@ namespace LordsItemEdits.ItemEdits
             _devastatorAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
         }
 
-        private static void AssignPrefabs()
+        private static void AssignMasterPrefabs()
         {
-            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_cutHpItemDefAssetReference).Completed += (handle) =>
-            {
-                _cutHpItemDef = handle.Result;
-                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_voidDiosItemAssetReference);
-            };
-
-
-
             AssetAsyncReferenceManager<GameObject>.LoadAsset(_reaverAllyMasterPrefabReference).Completed += (handle) =>
             {
                 _reaverAllyMasterPrefab = handle.Result;
@@ -104,18 +97,8 @@ namespace LordsItemEdits.ItemEdits
             };
         }
 
-        private static void EditAllOtherVoidAssets()
+        private static void EditVoidBodyPrefabs()
         {
-            // no way i'm letting engi turrets get this new void dios lmao
-            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_voidDiosItemAssetReference).Completed += (handle) =>
-            {
-                ItemDef voidDiosItemDef = handle.Result;
-                voidDiosItemDef.tags = [.. voidDiosItemDef.tags, ItemTag.CannotCopy];
-                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_voidDiosItemAssetReference);
-            };
-
-
-
             // void allies are playable now so i need to increase all of their interaction ranges since they can't reach anything normally
             AssetAsyncReferenceManager<GameObject>.LoadAsset(_reaverAllyBodyPrefabReference).Completed += (handle) =>
             {
@@ -139,6 +122,25 @@ namespace LordsItemEdits.ItemEdits
             };
         }
 
+        private static void EditItemPrefabs()
+        {
+            // no way i'm letting engi turrets get this new void dios lmao
+            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_voidDiosItemAssetReference).Completed += (handle) =>
+            {
+                ItemDef voidDiosItemDef = handle.Result;
+                voidDiosItemDef.tags = [.. voidDiosItemDef.tags, ItemTag.CannotCopy];
+                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_voidDiosItemAssetReference);
+            };
+
+            // why tf is this not already set as hidden
+            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_cutHpItemDefAssetReference).Completed += (handle) =>
+            {
+                _cutHpItemDef = handle.Result;
+                _cutHpItemDef.hidden = true;
+                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_voidDiosItemAssetReference);
+            };
+        }
+
 
 
         private static void ExtraLifeVoidManager_Init(ILContext il)
@@ -149,21 +151,15 @@ namespace LordsItemEdits.ItemEdits
                 x => x.MatchStsfld("RoR2.Items.ExtraLifeVoidManager", "voidBodyNames")
             ))
             {
-                Util.LogILError(il, c);
+                ModUtil.LogILError(il, c);
                 return;
             }
 
             // i could surgically replace/insert strings when the array's created but i can't be bothered to do that
             c.EmitDelegate<Action>(() =>
             {
-                if (ConfigOptions.AllowRespawnAsVoidReaver.Value)
-                {
-                    ExtraLifeVoidManager.voidBodyNames = ["NullifierAllyBody", "VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
-                }
-                else
-                {
-                    ExtraLifeVoidManager.voidBodyNames = ["VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
-                }
+                ExtraLifeVoidManager.voidBodyNames = ConfigOptions.AllowRespawnAsVoidReaver.Value ?
+                ["NullifierAllyBody", "VoidJailerAllyBody", "VoidMegaCrabAllyBody"] : ["VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
             });
         }
 
@@ -178,7 +174,7 @@ namespace LordsItemEdits.ItemEdits
                 x => x.MatchLdcR4(0)
             ))
             {
-                Util.LogILError(il, c);
+                ModUtil.LogILError(il, c);
                 return;
             }
             c.Emit(OpCodes.Ldarg_0);
@@ -186,15 +182,16 @@ namespace LordsItemEdits.ItemEdits
             {
                 if (!_lieVoidDiosTable.TryGetValue(characterMaster, out _))
                 {
-                    _lieVoidDiosTable.Add(characterMaster, new LieVoidDiosInfo { OriginalBodyPrefab = characterMaster.bodyPrefab });
+                    _lieVoidDiosTable.Add(characterMaster, new LieVoidDiosInfo { OriginalBodyPrefab = characterMaster.bodyPrefab, NameOfSceneFirstRevivedIn = SceneManager.GetActiveScene().name });
+                    Log.Info($"Giving {characterMaster.GetBody()?.name} a CutHp due to them using up a void dios for the first time this stage");
                     characterMaster.inventory?.GiveItem(_cutHpItemDef.itemIndex);
                 }
-                BaseAI originalBaseAI = characterMaster.GetComponent<BaseAI>();
+
                 GameObject voidAllyBodyPrefab = ExtraLifeVoidManager.GetNextBodyPrefab(); // the method to pick a void guy to respawn as is still there, just unused
-                GameObject voidAllyMasterPrefab = GetVoidAllyMasterPrefabFromBodyPrefab(voidAllyBodyPrefab);
-
-
                 characterMaster.bodyPrefab = voidAllyBodyPrefab;
+
+                BaseAI originalBaseAI = characterMaster.GetComponent<BaseAI>();
+                GameObject voidAllyMasterPrefab = GetVoidAllyMasterPrefabFromBodyPrefab(voidAllyBodyPrefab);
                 if (originalBaseAI != null && voidAllyMasterPrefab != null)
                 {
                     ReplaceAISkillDrivers(characterMaster, originalBaseAI, voidAllyMasterPrefab); // fixes the ai being lobotomized since the ai doesn't change with their body
@@ -213,7 +210,7 @@ namespace LordsItemEdits.ItemEdits
                 x => x.MatchStloc(5)
             ))
             {
-                Util.LogILError(il, c);
+                ModUtil.LogILError(il, c);
                 return;
             }
             c.Emit(OpCodes.Br, skipItemVoiding);
@@ -224,7 +221,7 @@ namespace LordsItemEdits.ItemEdits
                 x => x.MatchEndfinally()
             ))
             {
-                Util.LogILError(il, c);
+                ModUtil.LogILError(il, c);
                 return;
             }
             c.MarkLabel(skipItemVoiding);
@@ -243,6 +240,12 @@ namespace LordsItemEdits.ItemEdits
                 orig(self);
                 return;
             }
+            if (lieVoidDiosInfo.NameOfSceneFirstRevivedIn == SceneManager.GetActiveScene().name)
+            {
+                orig(self);
+                return;
+            }
+
 
 
             self.master.bodyPrefab = lieVoidDiosInfo.OriginalBodyPrefab;
@@ -251,17 +254,24 @@ namespace LordsItemEdits.ItemEdits
             {
                 if (self.master.inventory.GetItemCount(_cutHpItemDef.itemIndex) > 0)
                 {
-                    Log.Info($"Removing a CutHp from CharacterBody {self.name} that is Start-ing since they have a lieVoidDiosInfo");
+                    Log.Info($"Removing a CutHp from {self.name} that is Start-ing in a new stage after being revived by a void dios on the previous stage");
                     self.master.inventory.RemoveItem(_cutHpItemDef.itemIndex);
                 }
             }
             else
             {
-                Log.Error("SELF MASTER INVENTORY IN CharacterBody_Start WAS NULL!!!!! NOT GOOOD");
+                Log.Error("SELF MASTER INVENTORY IN CharacterBody_Start WAS NULL!!!!! NOT GOOOD!!!!! YOU'RE STUCK WITH A CUTHP ITEM NOW!!!");
             }
 
 
-            orig(self);
+            // HACK: for some reason the 3rd if statement in this method causes the bodyPrefab change to happen too late
+            // so we'll respawn the body and not call orig here
+            // that way the Start will happen only once and with the proper body
+
+            // this still makes you spawn in the air sometimes but idc it's good enough
+            Vector3 newSpawnPosition = TeleportHelper.FindSafeTeleportDestination(self.corePosition, self.master.bodyPrefab.GetComponent<CharacterBody>(), RoR2Application.rng) ?? self.corePosition;
+            self.master.Respawn(newSpawnPosition, Quaternion.Euler(0f, UnityEngine.Random.Range(0f, 360f), 0f), true);
+            return;
         }
         #endregion
 

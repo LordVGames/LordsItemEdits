@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LordsItemEdits
 {
-    internal class Util
+    internal class ModUtil
     {
         internal static void LogILError(ILContext il, ILCursor c)
         {

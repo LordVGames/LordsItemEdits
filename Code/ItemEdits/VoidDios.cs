@@ -18,23 +18,23 @@ namespace LordsItemEdits.ItemEdits
 {
     internal static class VoidDios
     {
-        private static AssetReferenceT<ItemDef> _voidDiosItemAssetReference;
-        private static AssetReferenceT<ItemDef> _cutHpItemDefAssetReference;
+        private static AssetReferenceT<ItemDef> _voidDiosItemAssetReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_ExtraLifeVoid.ExtraLifeVoid_asset);
+        private static AssetReferenceT<ItemDef> _cutHpItemDefAssetReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_CutHp.CutHp_asset);
         private static ItemDef _cutHpItemDef;
 
-        private static AssetReferenceT<GameObject> _reaverAllyMasterPrefabReference;
+        private static AssetReferenceT<GameObject> _reaverAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyMaster_prefab);
         private static GameObject _reaverAllyMasterPrefab;
-        private static AssetReferenceT<GameObject> _reaverAllyBodyPrefabReference;
+        private static AssetReferenceT<GameObject> _reaverAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyBody_prefab); 
         //private static GameObject _reaverAllyBodyPrefab;
 
-        private static AssetReferenceT<GameObject> _jailerAllyMasterPrefabReference;
+        private static AssetReferenceT<GameObject> _jailerAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyMaster_prefab);
         private static GameObject _jailerAllyMasterPrefab;
-        private static AssetReferenceT<GameObject> _jailerAllyBodyPrefabReference;
+        private static AssetReferenceT<GameObject> _jailerAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyBody_prefab);
         //private static GameObject _jailerAllyBodyPrefab;
 
-        private static AssetReferenceT<GameObject> _devastatorAllyMasterPrefabReference;
+        private static AssetReferenceT<GameObject> _devastatorAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
         private static GameObject _devastatorAllyMasterPrefab;
-        private static AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference;
+        private static AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
         //private static GameObject _devastatorAllyBodyPrefab;
         private static readonly FixedConditionalWeakTable<CharacterMaster, LieVoidDiosInfo> _lieVoidDiosTable = [];
         private class LieVoidDiosInfo
@@ -52,28 +52,12 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LoadAssetReferences();
             AssignMasterPrefabs();
             EditVoidBodyPrefabs();
             EditItemPrefabs();
             IL.RoR2.Items.ExtraLifeVoidManager.Init += ExtraLifeVoidManager_Init;
             IL.RoR2.CharacterMaster.RespawnExtraLifeVoid += CharacterMaster_RespawnExtraLifeVoid;
             On.RoR2.CharacterBody.Start += CharacterBody_Start;
-        }
-
-        private static void LoadAssetReferences()
-        {
-            _voidDiosItemAssetReference = new AssetReferenceT<ItemDef>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_ExtraLifeVoid.ExtraLifeVoid_asset);
-            _cutHpItemDefAssetReference = new AssetReferenceT<ItemDef>(RoR2BepInExPack.GameAssetPaths.RoR2_Base_CutHp.CutHp_asset);
-
-            _reaverAllyBodyPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyBody_prefab);
-            _reaverAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyMaster_prefab);
-
-            _jailerAllyBodyPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyBody_prefab);
-            _jailerAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyMaster_prefab);
-
-            _devastatorAllyBodyPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
-            _devastatorAllyMasterPrefabReference = new AssetReferenceT<GameObject>(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
         }
 
         private static void AssignMasterPrefabs()

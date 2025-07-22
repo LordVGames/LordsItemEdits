@@ -18,8 +18,8 @@ namespace LordsItemEdits.MultiItemEdits
 {
     internal class Missiles
     {
-        private static readonly AssetReferenceT<GameObject> _microMissileProjectileAssetReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Drones.MicroMissileProjectile_prefab);
-        private static readonly AssetReferenceT<GameObject> _microMissileOrbEffectReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_DroneWeapons.MicroMissileOrbEffect_prefab);
+        private static readonly AssetReferenceT<GameObject> _microMissileProjectileAssetReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Drones.MicroMissileProjectile_prefab);
+        private static readonly AssetReferenceT<GameObject> _microMissileOrbEffectReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_DroneWeapons.MicroMissileOrbEffect_prefab);
 
 
         internal static void Setup()
@@ -45,6 +45,15 @@ namespace LordsItemEdits.MultiItemEdits
                 return;
             }
             CharacterBody victimBody = victim.GetComponent<CharacterBody>();
+            FireMissileOrb(attackerBody, missileDamage, damageInfo, victimBody, true);
+        }
+
+        internal static void FireMissileOrb(CharacterBody attackerBody, float missileDamage, DamageInfo damageInfo, CharacterBody victimBody, bool addMissileProc)
+        {
+            if (victimBody == null || attackerBody.teamComponent.teamIndex != TeamIndex.Player)
+            {
+                return;
+            }
             MicroMissileOrb missileOrb = new()
             {
                 origin = attackerBody.aimOrigin,
@@ -57,7 +66,10 @@ namespace LordsItemEdits.MultiItemEdits
                 damageColorIndex = DamageColorIndex.Item,
                 target = victimBody.mainHurtBox
             };
-            missileOrb.procChainMask.AddProc(ProcType.Missile);
+            if (addMissileProc)
+            {
+                missileOrb.procChainMask.AddProc(ProcType.Missile);
+            }
             missileOrb.damageValue *= PocketICBM.GetICBMDamageMult(attackerBody);
             OrbManager.instance.AddOrb(missileOrb);
             // the orb doesn't play a sound on fire and editing the assets isn't working so

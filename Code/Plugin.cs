@@ -1,9 +1,11 @@
 using System;
 using BepInEx;
+using HarmonyLib;
 using RoR2;
 
 namespace LordsItemEdits
 {
+    [BepInDependency(SS2.SS2Main.GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Plugin : BaseUnityPlugin
     {
@@ -21,6 +23,12 @@ namespace LordsItemEdits
 
             ItemEdits.VoidDios.Setup();
             ItemEdits.ATG.Setup();
+
+            if (ModSupport.Starstorm2Mod.ModIsRunning)
+            {
+                ModSupport.Starstorm2.ArmedBackpack.Setup();
+                ModSupport.Starstorm2.ErraticGadget.Setup();
+            }
         }
     }
 }

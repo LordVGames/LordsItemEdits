@@ -1,12 +1,20 @@
 {
   "strings": {
     "ITEM_EXTRALIFEVOID_DESC": "<style=cIsUtility>Upon death</style>, this item will be <style=cIsUtility>consumed</style> and you will <style=cIsHealing>return to life</style> in a <style=cIsHealth>new body</style> that has <style=cIsHealth>-50% maximum health</style>. Return to your <style=cIsHealth>original body</style> in the next stage. <style=cIsVoid>Corrupts all Dio's Best Friends</style>.",
+
     "ITEM_MOREMISSILE_PICKUP": "Gain a huge damage increase for your missile items and some** missile-related skills.",
-    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills <style=cIsDamage>multiplicatively</style> by <style=cIsDamage>300%</style> <style=cStack>(+150% per stack)</style>."
+    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills by <style=cIsDamage>300%</style> <style=cStack>(+150% per stack)</style>.",
+
+    "SS2_ITEM_ERRATICGADGET_PICKUP": "Your lightning strikes deal double damage. Chance to fire chain lightning on hit.",
+    "SS2_ITEM_ERRATICGADGET_DESC": "Your lightning strikes deal <style=cIsDamage>double damage</style>. <style=cIsDamage>10%</style> chance on hit to fire <style=cIsDamage>chain lightning</style> for <style=cIsDamage>300%</style> TOTAL damage on up to <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> targets."
   },
   "en": {
     "ITEM_EXTRALIFEVOID_DESC": "<style=cIsUtility>Upon death</style>, this item will be <style=cIsUtility>consumed</style> and you will <style=cIsHealing>return to life</style> in a <style=cIsHealth>new body</style> that has <style=cIsHealth>-50% maximum health</style>. Return to your <style=cIsHealth>original body</style> in the next stage. <style=cIsVoid>Corrupts all Dio's Best Friends</style>.",
+
     "ITEM_MOREMISSILE_PICKUP": "Gain a huge damage increase for your missile items and some** missile-related skills.",
-    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills <style=cIsDamage>multiplicatively</style> by <style=cIsDamage>300%</style> <style=cStack>(+150% per stack)</style>."
+    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills <style=cIsDamage>multiplicatively</style> by <style=cIsDamage>300%</style> <style=cStack>(+150% per stack)</style>.",
+
+    "SS2_ITEM_ERRATICGADGET_PICKUP": "Your lightning items deal double damage. Chance to fire chain lightning on hit.",
+    "SS2_ITEM_ERRATICGADGET_DESC": "Your lightning strikes deal <style=cIsDamage>double damage</style>. <style=cIsDamage>10%</style> chance on hit to fire <style=cIsDamage>chain lightning</style> for <style=cIsDamage>300%</style> TOTAL damage on up to <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> targets."
   }
 }

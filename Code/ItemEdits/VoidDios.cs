@@ -18,23 +18,23 @@ namespace LordsItemEdits.ItemEdits
 {
     internal static class VoidDios
     {
-        private static AssetReferenceT<ItemDef> _voidDiosItemAssetReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_ExtraLifeVoid.ExtraLifeVoid_asset);
-        private static AssetReferenceT<ItemDef> _cutHpItemDefAssetReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_CutHp.CutHp_asset);
+        private static readonly AssetReferenceT<ItemDef> _voidDiosItemAssetReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_ExtraLifeVoid.ExtraLifeVoid_asset);
+        private static readonly AssetReferenceT<ItemDef> _cutHpItemDefAssetReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_CutHp.CutHp_asset);
         private static ItemDef _cutHpItemDef;
 
-        private static AssetReferenceT<GameObject> _reaverAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyMaster_prefab);
+        private static readonly AssetReferenceT<GameObject> _reaverAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Nullifier.NullifierAllyMaster_prefab);
         private static GameObject _reaverAllyMasterPrefab;
-        private static AssetReferenceT<GameObject> _reaverAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_Base_Nullifier.NullifierAllyBody_prefab); 
+        private static readonly AssetReferenceT<GameObject> _reaverAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Nullifier.NullifierAllyBody_prefab); 
         //private static GameObject _reaverAllyBodyPrefab;
 
-        private static AssetReferenceT<GameObject> _jailerAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyMaster_prefab);
+        private static readonly AssetReferenceT<GameObject> _jailerAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidJailer.VoidJailerAllyMaster_prefab);
         private static GameObject _jailerAllyMasterPrefab;
-        private static AssetReferenceT<GameObject> _jailerAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidJailer.VoidJailerAllyBody_prefab);
+        private static readonly AssetReferenceT<GameObject> _jailerAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidJailer.VoidJailerAllyBody_prefab);
         //private static GameObject _jailerAllyBodyPrefab;
 
-        private static AssetReferenceT<GameObject> _devastatorAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
+        private static readonly AssetReferenceT<GameObject> _devastatorAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
         private static GameObject _devastatorAllyMasterPrefab;
-        private static AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPaths.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
+        private static readonly AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
         //private static GameObject _devastatorAllyBodyPrefab;
         private static readonly FixedConditionalWeakTable<CharacterMaster, LieVoidDiosInfo> _lieVoidDiosTable = [];
         private class LieVoidDiosInfo
@@ -127,6 +127,7 @@ namespace LordsItemEdits.ItemEdits
 
 
 
+        // TODO maybe make this use monodetour
         private static void ExtraLifeVoidManager_Init(ILContext il)
         {
             ILCursor c = new(il);

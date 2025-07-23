@@ -32,10 +32,12 @@ namespace LordsItemEdits.ModSupport.Starstorm2
                 x => x.MatchMul(),
                 x => x.MatchStloc(3) && w.SetCurrentTo(x)
             ).ThrowIfFailure();
-            w.InsertAfterCurrent(w.Create(OpCodes.Ldloc_3));
-            w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_1));
-            w.InsertAfterCurrent(w.CreateCall(FireMissileOrbIfApplicable));
-            w.InsertAfterCurrent(w.Create(OpCodes.Brtrue, skipFireMissile));
+            w.InsertAfterCurrent(
+                w.Create(OpCodes.Ldloc_3),
+                w.Create(OpCodes.Ldarg_1),
+                w.CreateCall(FireMissileOrbIfApplicable),
+                w.Create(OpCodes.Brtrue, skipFireMissile)
+            );
 
 
             w.MatchRelaxed(

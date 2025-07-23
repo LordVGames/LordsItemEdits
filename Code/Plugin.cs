@@ -23,6 +23,7 @@ namespace LordsItemEdits
 
             ItemEdits.VoidDios.Setup();
             ItemEdits.ATG.Setup();
+            ItemEdits.Plimp.Setup();
 
             if (ModSupport.Starstorm2Mod.ModIsRunning)
             {

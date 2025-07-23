@@ -21,7 +21,6 @@ namespace LordsItemEdits.MultiItemEdits
         private static readonly AssetReferenceT<GameObject> _microMissileProjectileAssetReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Drones.MicroMissileProjectile_prefab);
         private static readonly AssetReferenceT<GameObject> _microMissileOrbEffectReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_DroneWeapons.MicroMissileOrbEffect_prefab);
 
-
         internal static void Setup()
         {
             // why doesn't this have a start sound???

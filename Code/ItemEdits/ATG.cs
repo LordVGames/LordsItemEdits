@@ -17,7 +17,7 @@ namespace LordsItemEdits.ItemEdits
     {
         internal static void Setup()
         {
-            if (!ConfigOptions.EnableAtgEdit.Value)
+            if (!ConfigOptions.ATG.EnableAtgEdit.Value)
             {
                 return;
             }

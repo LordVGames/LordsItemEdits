@@ -10,6 +10,7 @@
 		<RestoreAdditionalProjectSources>
 			https://nuget.windows10ce.com/nuget/v3/index.json
 		</RestoreAdditionalProjectSources>
+		<MonoDetourHookGenNamespace>MonoDetourHooks</MonoDetourHookGenNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

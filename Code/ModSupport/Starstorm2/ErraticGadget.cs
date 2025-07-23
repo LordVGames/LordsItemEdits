@@ -20,11 +20,17 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            On.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
-            On.SS2.Items.ErraticGadget.LightningOrb_OnArrival.ILHook(SkipDoublingProc);
-            On.SS2.Items.ErraticGadget.LightningStrikeOrb_OnArrival.ControlFlowPrefix(LightningStrikeOrb_JustDoubleDamage);
-            On.SS2.Items.ErraticGadget.SimpleLightningStrikeOrb_OnArrival.ControlFlowPrefix(SimpleLightningStrikeOrb_JustDoubleDamage);
+            MonoDetourHooks.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
+            if (ConfigOptions.SS2Items.ErraticGadget.TurnDoubleProcsIntoDoubleDamage.Value)
+            {
+                MonoDetourHooks.SS2.Items.ErraticGadget.LightningOrb_OnArrival.ILHook(SkipDoublingProc);
+                MonoDetourHooks.SS2.Items.ErraticGadget.LightningStrikeOrb_OnArrival.ControlFlowPrefix(LightningStrikeOrb_JustDoubleDamage);
+                MonoDetourHooks.SS2.Items.ErraticGadget.SimpleLightningStrikeOrb_OnArrival.ControlFlowPrefix(SimpleLightningStrikeOrb_JustDoubleDamage);
+            }
         }
+
+
+
 
         private static void FixProcChainingWithSelf(ILManipulationInfo info)
         {
@@ -42,11 +48,13 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             );
 
 
-            w.MatchRelaxed(
+            /*w.MatchRelaxed(
                 x => x.MatchLdloc(1),
                 x => x.MatchLdflda(out _),
                 x => x.MatchInitobj(out _) && w.SetCurrentTo(x)
-            ).ThrowIfFailure();
+            ).ThrowIfFailure();*/
+            w.CurrentToNext();
+            w.CurrentToNext();
             w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_1));
             w.MarkLabelToCurrent(skipStupid);
             w.InsertAfterCurrent(

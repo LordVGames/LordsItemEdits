@@ -47,7 +47,7 @@ namespace LordsItemEdits.ItemEdits
 
         internal static void Setup()
         {
-            if (!ConfigOptions.EnableVoidDiosEdit.Value)
+            if (!ConfigOptions.VoidDios.EnableVoidDiosEdit.Value)
             {
                 return;
             }
@@ -143,7 +143,7 @@ namespace LordsItemEdits.ItemEdits
             // i could surgically replace/insert strings when the array's created but i can't be bothered to do that
             c.EmitDelegate<Action>(() =>
             {
-                ExtraLifeVoidManager.voidBodyNames = ConfigOptions.AllowRespawnAsVoidReaver.Value ?
+                ExtraLifeVoidManager.voidBodyNames = ConfigOptions.VoidDios.AllowRespawnAsVoidReaver.Value ?
                 ["NullifierAllyBody", "VoidJailerAllyBody", "VoidMegaCrabAllyBody"] : ["VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
             });
         }

@@ -11,14 +11,13 @@ using LordsItemEdits.MultiItemEdits;
 
 namespace LordsItemEdits.ModSupport.Starstorm2
 {
-    // it's publicized, shut up
     [MonoDetourTargets(typeof(SS2.Items.ArmedBackpack.Behavior))]
     internal class ArmedBackpack
     {
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            On.SS2.Items.ArmedBackpack.Behavior.OnTakeDamageServer.ILHook(ReplaceMissileWithOrb);
+            MonoDetourHooks.SS2.Items.ArmedBackpack.Behavior.OnTakeDamageServer.ILHook(ReplaceMissileWithOrb);
         }
 
         private static void ReplaceMissileWithOrb(ILManipulationInfo info)
@@ -31,8 +30,8 @@ namespace LordsItemEdits.ModSupport.Starstorm2
                 x => x.MatchLdloc(2),
                 x => x.MatchMul(),
                 x => x.MatchStloc(3) && w.SetCurrentTo(x)
-            ).ThrowIfFailure();
-            w.InsertAfterCurrent(
+            ).ThrowIfFailure()
+            .InsertAfterCurrent(
                 w.Create(OpCodes.Ldloc_3),
                 w.Create(OpCodes.Ldarg_1),
                 w.CreateCall(FireMissileOrbIfApplicable),
@@ -43,8 +42,8 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             w.MatchRelaxed(
                 x => x.MatchCall("RoR2.MissileUtils", "FireMissile") && w.SetCurrentTo(x),
                 x => x.MatchRet()
-            ).ThrowIfFailure();
-            w.MarkLabelToCurrentNext(skipFireMissile);
+            ).ThrowIfFailure()
+            .MarkLabelToCurrentNext(skipFireMissile);
 
 
             //w.LogILInstructions();

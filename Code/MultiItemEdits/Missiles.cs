@@ -1,41 +1,68 @@
-﻿using HG;
-using LordsItemEdits.ItemEdits;
-using MiscFixes.Modules;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using RoR2;
-using RoR2.ContentManagement;
-using RoR2.Orbs;
-using RoR2.Projectile;
-using RoR2BepInExPack.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using LordsItemEdits.ItemEdits;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MonoDetour;
+using MonoDetour.HookGen;
+using MonoDetour.Cil;
+using RoR2;
+using RoR2.Orbs;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 
 namespace LordsItemEdits.MultiItemEdits
 {
     internal class Missiles
     {
-        private static readonly AssetReferenceT<GameObject> _microMissileProjectileAssetReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Drones.MicroMissileProjectile_prefab);
-        private static readonly AssetReferenceT<GameObject> _microMissileOrbEffectReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_DroneWeapons.MicroMissileOrbEffect_prefab);
-
-        internal static void Setup()
+        [MonoDetourTargets(typeof(MissileUtils))]
+        internal static class MonoDetourEdits
         {
-            // why doesn't this have a start sound???
-            /*AssetAsyncReferenceManager<GameObject>.LoadAsset(_microMissileProjectileAssetReference).Completed += (handle) =>
+            [MonoDetourHookInitialize]
+            internal static void Setup()
             {
-                handle.Result.GetComponent<ProjectileController>().startSound = "Play_item_proc_missile_fire";
-                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_microMissileProjectileAssetReference);
-            };
-            AssetAsyncReferenceManager<GameObject>.LoadAsset(_microMissileOrbEffectReference).Completed += (handle) =>
-            {
-                handle.Result.GetComponent<EffectComponent>().soundName = "Play_item_proc_missile_fire";
-                AssetAsyncReferenceManager<GameObject>.UnloadAsset(_microMissileOrbEffectReference);
-            };*/
-        }
+                // this affects both engi harpoon and DML this is in here
+                if (ConfigOptions.PocketICBM.ChangeDMLEffect.Value || ConfigOptions.PocketICBM.ChangeEngiHarpoonEffect.Value)
+                {
+                    MonoDetourHooks.RoR2.MissileUtils.FireMissile_UnityEngine_Vector3_RoR2_CharacterBody_RoR2_ProcChainMask_UnityEngine_GameObject_System_Single_System_Boolean_UnityEngine_GameObject_RoR2_DamageColorIndex_UnityEngine_Vector3_System_Single_System_Boolean.ILHook(ChangeICBMEffect);
+                }
+            }
 
+            private static void ChangeICBMEffect(ILManipulationInfo info)
+            {
+                ILWeaver w = new(info);
+
+
+                // near the end of "float num3 = Mathf.Max(1f, 1f + 0.5f * (float)(valueOrDefault - 1));"
+                w.MatchRelaxed(
+                    x => x.MatchMul(),
+                    x => x.MatchAdd(),
+                    x => x.MatchCall(out _) && w.SetCurrentTo(x),
+                    x => x.MatchStloc(1)
+                ).ThrowIfFailure()
+                .InsertAfterCurrent(
+                    w.Create(OpCodes.Ldarg_1),
+                    w.CreateCall(ReplaceOldICBMDamageMult)
+                );
+
+
+                // after "ProjectileManager.instance.FireProjectile(fireProjectileInfo);"
+                w.MatchRelaxed(
+                    x => x.MatchCall(out _),
+                    x => x.MatchLdloc(4),
+                    x => x.MatchCallvirt(out _) && w.SetCurrentTo(x)
+                ).ThrowIfFailure()
+                .InsertAfterCurrent(
+                    // its that easy
+                    w.Create(OpCodes.Ret)
+                );
+            }
+
+            private static float ReplaceOldICBMDamageMult(float oldDamageMult, CharacterBody attackerBody)
+            {
+                return PocketICBM.GetICBMDamageMult(attackerBody);
+            }
+        }
 
         internal static void FireMissileOrb(CharacterBody attackerBody, float missileDamage, DamageInfo damageInfo, GameObject victim)
         {

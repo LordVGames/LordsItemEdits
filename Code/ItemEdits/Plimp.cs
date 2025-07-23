@@ -34,20 +34,9 @@ namespace LordsItemEdits.ItemEdits
                 x => x.MatchStloc(47)
             ).ThrowIfFailure()
             .InsertAfterCurrent(
-                w.CreateCall(RemoveOldICBMDamageMultIfNeeded)
-            );
-
-
-            // near the end of "float num12 = Util.OnHitProcDamage(damageInfo.damage, characterBody.damage, num11) * num10;"
-            w.MatchRelaxed(
-                x => x.MatchLdloc(47),
-                x => x.MatchMul() && w.SetCurrentTo(x),
-                x => x.MatchStloc(49)
-            ).ThrowIfFailure()
-            .InsertAfterCurrent(
                 w.Create(OpCodes.Ldloc_0),
                 w.Create(OpCodes.Ldloc, 46),
-                w.CreateCall(ChangePlimpDamageIfNeeded)
+                w.CreateCall(ChangeICBMDamageMultIfNeeded)
             );
 
 
@@ -63,23 +52,13 @@ namespace LordsItemEdits.ItemEdits
             );
         }
 
-        private static float RemoveOldICBMDamageMultIfNeeded(float oldDamageMult)
+        private static float ChangeICBMDamageMultIfNeeded(float oldDamageMult, CharacterBody characterBody, int allowICBMEffectsAsInt)
         {
-            // removing it in the sense of making it not do anything
-            if (ConfigOptions.PocketICBM.ChangePlimpEffect.Value)
+            if (ConfigOptions.PocketICBM.ChangePlimpEffect.Value && allowICBMEffectsAsInt > 0)
             {
-                return 1f;
+                return PocketICBM.GetICBMDamageMult(characterBody);
             }
             return oldDamageMult;
-        }
-
-        private static float ChangePlimpDamageIfNeeded(float plimpDamage, CharacterBody characterBody, int allowPlimpAsInt)
-        {
-            if (ConfigOptions.PocketICBM.ChangePlimpEffect.Value && allowPlimpAsInt > 0)
-            {
-                return plimpDamage * PocketICBM.GetICBMDamageMult(characterBody);
-            }
-            return plimpDamage;
         }
 
         private static int ChangePlimpAmountIfNeeded(int currentPlimpAmount)

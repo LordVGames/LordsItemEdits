@@ -21,6 +21,7 @@ namespace LordsItemEdits
             Log.Init(Logger);
             ConfigOptions.BindConfigOptions(Config);
 
+            MultiItemEdits.Missiles.MonoDetourEdits.Setup();
             ItemEdits.VoidDios.Setup();
             ItemEdits.ATG.Setup();
             ItemEdits.Plimp.Setup();

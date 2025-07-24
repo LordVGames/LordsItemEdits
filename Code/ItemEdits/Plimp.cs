@@ -16,6 +16,11 @@ namespace LordsItemEdits.ItemEdits
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
+            if (!ConfigOptions.PocketICBM.ChangePlimpEffect.Value)
+            {
+                return;
+            }
+
             MonoDetourHooks.RoR2.GlobalEventManager.ProcessHitEnemy.ILHook(ReplacePlimpICBMEffect);
         }
 

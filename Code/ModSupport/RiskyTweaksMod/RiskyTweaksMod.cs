@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LordsItemEdits.ModSupport
+namespace LordsItemEdits.ModSupport.RiskyTweaksMod
 {
-    internal class Starstorm2Mod
+    internal class RiskyTweaksMod
     {
+        internal const string GUID = "com.Moffein.RiskyTweaks";
         private static bool? _enabled;
 
         internal static bool ModIsRunning
         {
             get
             {
-                _enabled ??= BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(SS2.SS2Main.GUID);
+                _enabled ??= BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(GUID);
                 return (bool)_enabled;
             }
         }

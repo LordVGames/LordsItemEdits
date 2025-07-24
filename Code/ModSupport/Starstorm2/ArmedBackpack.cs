@@ -17,6 +17,11 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
+            if (!ConfigOptions.SS2Items.ArmedBackpack.EnableArmedBackpackEdit.Value)
+            {
+                return;
+            }
+
             MonoDetourHooks.SS2.Items.ArmedBackpack.Behavior.OnTakeDamageServer.ILHook(ReplaceMissileWithOrb);
         }
 

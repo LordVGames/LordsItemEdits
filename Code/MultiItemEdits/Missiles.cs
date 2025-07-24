@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using LordsItemEdits.ItemEdits;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoDetour;
 using MonoDetour.HookGen;
 using MonoDetour.Cil;
+using UnityEngine;
 using RoR2;
 using RoR2.Orbs;
-using UnityEngine;
+using LordsItemEdits.ItemEdits;
 
 namespace LordsItemEdits.MultiItemEdits
 {
@@ -80,6 +80,8 @@ namespace LordsItemEdits.MultiItemEdits
             {
                 return;
             }
+
+
             MicroMissileOrb missileOrb = new()
             {
                 origin = attackerBody.aimOrigin,
@@ -96,7 +98,20 @@ namespace LordsItemEdits.MultiItemEdits
             {
                 missileOrb.procChainMask.AddProc(ProcType.Missile);
             }
-            missileOrb.damageValue *= PocketICBM.GetICBMDamageMult(attackerBody);
+
+
+            if (ConfigOptions.PocketICBM.ChangeATGEffect.Value && addMissileProc || ConfigOptions.PocketICBM.ChangeArmedBackpackEffect.Value && !addMissileProc)
+            {
+                missileOrb.damageValue *= PocketICBM.GetICBMDamageMult(attackerBody);
+            }
+            else
+            {
+                OrbManager.instance.AddOrb(missileOrb);
+                OrbManager.instance.AddOrb(missileOrb);
+                // gotta be authentic with the missile spam experience lmao
+                Util.PlaySound("Play_item_proc_missile_fire", attackerBody.gameObject);
+                Util.PlaySound("Play_item_proc_missile_fire", attackerBody.gameObject);
+            }
             OrbManager.instance.AddOrb(missileOrb);
             // the orb doesn't play a sound on fire and editing the assets isn't working so
             Util.PlaySound("Play_item_proc_missile_fire", attackerBody.gameObject);

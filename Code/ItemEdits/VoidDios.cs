@@ -25,17 +25,15 @@ namespace LordsItemEdits.ItemEdits
         private static readonly AssetReferenceT<GameObject> _reaverAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Nullifier.NullifierAllyMaster_prefab);
         private static GameObject _reaverAllyMasterPrefab;
         private static readonly AssetReferenceT<GameObject> _reaverAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_Base_Nullifier.NullifierAllyBody_prefab); 
-        //private static GameObject _reaverAllyBodyPrefab;
 
         private static readonly AssetReferenceT<GameObject> _jailerAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidJailer.VoidJailerAllyMaster_prefab);
         private static GameObject _jailerAllyMasterPrefab;
         private static readonly AssetReferenceT<GameObject> _jailerAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidJailer.VoidJailerAllyBody_prefab);
-        //private static GameObject _jailerAllyBodyPrefab;
 
         private static readonly AssetReferenceT<GameObject> _devastatorAllyMasterPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyMaster_prefab);
         private static GameObject _devastatorAllyMasterPrefab;
         private static readonly AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
-        //private static GameObject _devastatorAllyBodyPrefab;
+
         private static readonly FixedConditionalWeakTable<CharacterMaster, LieVoidDiosInfo> _lieVoidDiosTable = [];
         private class LieVoidDiosInfo
         {

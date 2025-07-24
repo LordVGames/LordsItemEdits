@@ -1,11 +1,14 @@
 using System;
 using BepInEx;
 using HarmonyLib;
+using MiscFixes.Modules;
 using RoR2;
 
 namespace LordsItemEdits
 {
     [BepInDependency(SS2.SS2Main.GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(RocketSurvivor.RocketSurvivorPlugin.MODUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModSupport.RiskyTweaksMod.RiskyTweaksMod.GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Plugin : BaseUnityPlugin
     {
@@ -20,16 +23,27 @@ namespace LordsItemEdits
             PluginInfo = Info;
             Log.Init(Logger);
             ConfigOptions.BindConfigOptions(Config);
+            Config.WipeConfig();
 
             MultiItemEdits.Missiles.MonoDetourEdits.Setup();
             ItemEdits.VoidDios.Setup();
             ItemEdits.ATG.Setup();
             ItemEdits.Plimp.Setup();
 
-            if (ModSupport.Starstorm2Mod.ModIsRunning)
+            if (ModSupport.Starstorm2.Starstorm2Mod.ModIsRunning)
             {
                 ModSupport.Starstorm2.ArmedBackpack.Setup();
                 ModSupport.Starstorm2.ErraticGadget.Setup();
+            }
+
+            if (ModSupport.RocketSurvivorGuy.RocketSurvivorGuy.ModIsRunning)
+            {
+                ModSupport.RocketSurvivorGuy.PrimaryICBMSupport.Setup();
+            }
+
+            if (ModSupport.RiskyTweaksMod.RiskyTweaksMod.ModIsRunning)
+            {
+                //ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEdit.Setup();
             }
         }
     }

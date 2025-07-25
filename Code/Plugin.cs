@@ -29,6 +29,7 @@ namespace LordsItemEdits
             ItemEdits.VoidDios.Setup();
             ItemEdits.ATG.Setup();
             ItemEdits.Plimp.Setup();
+            ItemEdits.BottledChaos.Setup();
 
             if (ModSupport.Starstorm2.Starstorm2Mod.ModIsRunning)
             {
@@ -43,7 +44,9 @@ namespace LordsItemEdits
 
             if (ModSupport.RiskyTweaksMod.RiskyTweaksMod.ModIsRunning)
             {
-                //ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEdit.Setup();
+                ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEdit.Setup();
+                //Harmony harmony = new(PluginGUID);
+                //harmony.CreateClassProcessor(typeof(ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEditHarmony)).Patch();
             }
         }
     }

@@ -17,7 +17,7 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            if (!ConfigOptions.SS2Items.ArmedBackpack.EnableArmedBackpackEdit.Value)
+            if (!ConfigOptions.SS2Items.ArmedBackpack.EnableEdit.Value)
             {
                 return;
             }

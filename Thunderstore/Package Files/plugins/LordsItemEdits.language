@@ -5,6 +5,9 @@
     "ITEM_MOREMISSILE_PICKUP": "Gain a huge damage increase for your missile items and some** missile-related skills.",
     "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills by <style=cIsDamage>3x</style> <style=cStack>(+1.5x per stack)</style>.",
 
+    "ITEM_RANDOMEQUIPMENTTRIGGER_PICKUP": "Greatly reduce equipment cooldown. Activating your Equipment triggers an additional, random Equipment effect.",
+    "ITEM_RANDOMEQUIPMENTTRIGGER_DESC": "<style=cIsUtility>Reduce equipment cooldown</style> by <style=cIsUtility>35%</style>. Trigger a <style=cIsDamage>random equipment</style> effect <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> time(s).",
+
     "SS2_ITEM_ERRATICGADGET_PICKUP": "Your lightning strikes deal double damage. Chance to fire chain lightning on hit.",
     "SS2_ITEM_ERRATICGADGET_DESC": "Your lightning strikes deal <style=cIsDamage>2x</style> damage. <style=cIsDamage>10%</style> chance on hit to fire <style=cIsDamage>chain lightning</style> for <style=cIsDamage>300%</style> TOTAL damage on up to <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> targets."
   },
@@ -13,6 +16,9 @@
 
     "ITEM_MOREMISSILE_PICKUP": "Gain a huge damage increase for your missile items and some** missile-related skills.",
     "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills by <style=cIsDamage>3x</style> <style=cStack>(+1.5x per stack)</style>.",
+
+    "ITEM_RANDOMEQUIPMENTTRIGGER_PICKUP": "Greatly reduce equipment cooldown. Activating your Equipment triggers an additional, random Equipment effect.",
+    "ITEM_RANDOMEQUIPMENTTRIGGER_DESC": "<style=cIsUtility>Reduce equipment cooldown</style> by <style=cIsUtility>35%</style>. Trigger a <style=cIsDamage>random equipment</style> effect <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> time(s).",
 
     "SS2_ITEM_ERRATICGADGET_PICKUP": "Your lightning items deal double damage. Chance to fire chain lightning on hit.",
     "SS2_ITEM_ERRATICGADGET_DESC": "Your lightning strikes deal <style=cIsDamage>2x</style> damage. <style=cIsDamage>10%</style> chance on hit to fire <style=cIsDamage>chain lightning</style> for <style=cIsDamage>300%</style> TOTAL damage on up to <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> targets."

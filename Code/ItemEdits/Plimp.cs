@@ -16,7 +16,7 @@ namespace LordsItemEdits.ItemEdits
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            if (!ConfigOptions.PocketICBM.ChangePlimpEffect.Value)
+            if (!ConfigOptions.PocketICBM.ChangePlasmaShrimpEffect.Value)
             {
                 return;
             }
@@ -59,7 +59,7 @@ namespace LordsItemEdits.ItemEdits
 
         private static float ChangeICBMDamageMultIfNeeded(float oldDamageMult, CharacterBody characterBody, int allowICBMEffectsAsInt)
         {
-            if (ConfigOptions.PocketICBM.ChangePlimpEffect.Value && allowICBMEffectsAsInt > 0)
+            if (ConfigOptions.PocketICBM.ChangePlasmaShrimpEffect.Value && allowICBMEffectsAsInt > 0)
             {
                 return PocketICBM.GetICBMDamageMult(characterBody);
             }
@@ -68,7 +68,7 @@ namespace LordsItemEdits.ItemEdits
 
         private static int ChangePlimpAmountIfNeeded(int currentPlimpAmount)
         {
-            if (ConfigOptions.PocketICBM.ChangePlimpEffect.Value && currentPlimpAmount == 3)
+            if (ConfigOptions.PocketICBM.ChangePlasmaShrimpEffect.Value && currentPlimpAmount == 3)
             {
                 return 1;
             }

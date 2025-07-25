@@ -21,7 +21,7 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         internal static void Setup()
         {
             MonoDetourHooks.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
-            if (ConfigOptions.SS2Items.ErraticGadget.TurnDoubleProcsIntoDoubleDamage.Value)
+            if (ConfigOptions.SS2Items.ErraticGadget.EnableEdit.Value)
             {
                 MonoDetourHooks.SS2.Items.ErraticGadget.LightningOrb_OnArrival.ILHook(SkipDoublingProc);
                 MonoDetourHooks.SS2.Items.ErraticGadget.LightningStrikeOrb_OnArrival.ControlFlowPrefix(LightningStrikeOrb_JustDoubleDamage);
@@ -113,6 +113,7 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         }
 
 
+        // charged perforator
         private static ReturnFlow SimpleLightningStrikeOrb_JustDoubleDamage(SS2.Items.ErraticGadget self, ref On.RoR2.Orbs.SimpleLightningStrikeOrb.orig_OnArrival orig, ref RoR2.Orbs.SimpleLightningStrikeOrb simpleLightningStrikeOrb)
         {
             if (!AllowErraticGadgetDamageBuff(simpleLightningStrikeOrb.attacker))
@@ -128,6 +129,7 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         }
 
 
+        // royal capacitor
         private static ReturnFlow LightningStrikeOrb_JustDoubleDamage(SS2.Items.ErraticGadget self, ref On.RoR2.Orbs.LightningStrikeOrb.orig_OnArrival orig, ref RoR2.Orbs.LightningStrikeOrb lightningStrikeOrb)
         {
             if (!AllowErraticGadgetDamageBuff(lightningStrikeOrb.attacker))

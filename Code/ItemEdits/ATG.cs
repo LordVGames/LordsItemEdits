@@ -17,7 +17,7 @@ namespace LordsItemEdits.ItemEdits
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            if (!ConfigOptions.ATG.EnableAtgEdit.Value)
+            if (!ConfigOptions.ATG.EnableEdit.Value)
             {
                 return;
             }

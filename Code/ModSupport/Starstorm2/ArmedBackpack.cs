@@ -31,6 +31,7 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             ILLabel skipFireMissile = w.DefineLabel();
 
 
+            //w.LogILInstructions();
             if (ConfigOptions.SS2Items.HookForBetaVersion.Value)
             {
                 // going to after line:
@@ -85,7 +86,6 @@ namespace LordsItemEdits.ModSupport.Starstorm2
                 ).ThrowIfFailure()
                 .MarkLabelToCurrentNext(skipFireMissile);
             }
-            //w.LogILInstructions();
         }
 
         private static bool FireMissileOrbIfApplicable(float missileDamage, DamageReport damageReport)

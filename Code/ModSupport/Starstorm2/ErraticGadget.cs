@@ -22,9 +22,9 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
+            // this is apparently fixed in the official beta
             if (ConfigOptions.SS2Items.ErraticGadget.EnableProcChainingFix.Value && !ConfigOptions.SS2Items.HookForBetaVersion.Value)
             {
-                // this is apparently fixed in the official beta so it's toggleable
                 MonoDetourHooks.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
             }
             if (ConfigOptions.SS2Items.ErraticGadget.EnableEdit.Value)

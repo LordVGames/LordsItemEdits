@@ -1,10 +1,10 @@
 {
   "strings": {
     "ITEM_MOREMISSILE_PICKUP": "Gain a huge damage increase for your missile items and some** missile-related skills.",
-    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills by <style=cIsDamage>3x</style> <style=cStack>(+1.5x per stack)</style>."
+    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all <style=cIsDamage>missile items</style> and some** <style=cIsDamage>missile skills</style> by <style=cIsDamage>3x</style> <style=cStack>(+1.5x per stack)</style>."
   },
   "en": {
     "ITEM_MOREMISSILE_PICKUP": "Gain a huge damage increase for your missile items and some** missile-related skills.",
-    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all missile items and some** missile skills by <style=cIsDamage>3x</style> <style=cStack>(+1.5x per stack)</style>."
+    "ITEM_MOREMISSILE_DESC": "Increases the TOTAL damage for all <style=cIsDamage>missile items</style> and some** <style=cIsDamage>missile skills</style> by <style=cIsDamage>3x</style> <style=cStack>(+1.5x per stack)</style>."
   }
 }

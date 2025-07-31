@@ -1,8 +1,8 @@
 ﻿{
 	"name": "LordsItemEdits",
-	"version_number": "0.2.0",
+	"version_number": "0.2.1",
 	"website_url": "https://github.com/LordVGames/LordsItemEdits",
-	"description": "A collection of item edits by me that makes some items more fun and/or interesting. Currently just edits Pluripotent Larva.",
+	"description": "A W.I.P collection of item edits by me that makes some items more fun, interesting, and/or better for performance. Supports some Starstorm 2 items!",
 	"dependencies": [
 		"bbepis-BepInExPack-5.4.2117",
 		"RiskofThunder-HookGenPatcher-1.2.5",

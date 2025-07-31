@@ -1,3 +1,8 @@
+## 0.2.1
+
+Changed package description (forgot to earlier)
+- I'll update the icon later idc rn
+
 ## 0.2.0
 
 - Void Dios

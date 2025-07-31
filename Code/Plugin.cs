@@ -14,7 +14,7 @@ namespace LordsItemEdits
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "LordVGames";
         public const string PluginName = "LordsItemEdits";
-        public const string PluginVersion = "0.2.0";
+        public const string PluginVersion = "0.2.1";
 
         public void Awake()
         {

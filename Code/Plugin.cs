@@ -1,8 +1,6 @@
 using System;
 using BepInEx;
-using HarmonyLib;
 using MiscFixes.Modules;
-using RoR2;
 
 namespace LordsItemEdits
 {
@@ -16,7 +14,7 @@ namespace LordsItemEdits
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "LordVGames";
         public const string PluginName = "LordsItemEdits";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "0.2.0";
 
         public void Awake()
         {
@@ -30,6 +28,10 @@ namespace LordsItemEdits
             ItemEdits.ATG.Setup();
             ItemEdits.Plimp.Setup();
             ItemEdits.BottledChaos.Setup();
+            ItemEdits.MoltenPerforator.Setup();
+            //ItemEdits.Planula.Setup();
+            ItemEdits.ExecutiveCard.Setup();
+            ItemEdits.PocketICBM.Setup();
 
             if (ModSupport.Starstorm2.Starstorm2Mod.ModIsRunning)
             {
@@ -45,8 +47,6 @@ namespace LordsItemEdits
             if (ModSupport.RiskyTweaksMod.RiskyTweaksMod.ModIsRunning)
             {
                 ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEdit.Setup();
-                //Harmony harmony = new(PluginGUID);
-                //harmony.CreateClassProcessor(typeof(ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEditHarmony)).Patch();
             }
         }
     }

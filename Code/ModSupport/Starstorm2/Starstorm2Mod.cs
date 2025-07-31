@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LordsItemEdits.ModSupport.Starstorm2
 {
-    internal class Starstorm2Mod
+    internal static class Starstorm2Mod
     {
         private static bool? _enabled;
 

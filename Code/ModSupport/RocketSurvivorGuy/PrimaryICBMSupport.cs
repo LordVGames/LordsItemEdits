@@ -14,7 +14,7 @@ using LordsItemEdits.ItemEdits;
 namespace LordsItemEdits.ModSupport.RocketSurvivorGuy
 {
     [MonoDetourTargets(typeof(EntityStates.RocketSurvivorSkills.Primary.FireRocket))]
-    internal class PrimaryICBMSupport
+    internal static class PrimaryICBMSupport
     {
         [MonoDetourHookInitialize]
         internal static void Setup()

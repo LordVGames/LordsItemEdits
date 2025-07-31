@@ -12,7 +12,7 @@ using LordsItemEdits.MultiItemEdits;
 
 namespace LordsItemEdits.ItemEdits
 {
-    internal class ATG
+    internal static class ATG
     {
         [MonoDetourHookInitialize]
         internal static void Setup()

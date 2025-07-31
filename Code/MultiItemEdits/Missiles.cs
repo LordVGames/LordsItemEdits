@@ -13,7 +13,7 @@ using LordsItemEdits.ItemEdits;
 
 namespace LordsItemEdits.MultiItemEdits
 {
-    internal class Missiles
+    internal static class Missiles
     {
         [MonoDetourTargets(typeof(MissileUtils))]
         internal static class MonoDetourEdits
@@ -22,7 +22,7 @@ namespace LordsItemEdits.MultiItemEdits
             internal static void Setup()
             {
                 // this affects both engi harpoon and DML this is in here
-                if (ConfigOptions.PocketICBM.ChangeDMLEffect.Value || ConfigOptions.PocketICBM.ChangeEngiHarpoonEffect.Value)
+                if (ConfigOptions.PocketICBM.EnableEdit.Value && ConfigOptions.PocketICBM.ChangeGenericMissileEffect.Value)
                 {
                     MonoDetourHooks.RoR2.MissileUtils.FireMissile_UnityEngine_Vector3_RoR2_CharacterBody_RoR2_ProcChainMask_UnityEngine_GameObject_System_Single_System_Boolean_UnityEngine_GameObject_RoR2_DamageColorIndex_UnityEngine_Vector3_System_Single_System_Boolean.ILHook(ChangeICBMEffect);
                 }
@@ -100,7 +100,10 @@ namespace LordsItemEdits.MultiItemEdits
             }
 
 
-            if (ConfigOptions.PocketICBM.ChangeATGEffect.Value && addMissileProc || ConfigOptions.PocketICBM.ChangeArmedBackpackEffect.Value && !addMissileProc)
+            if (
+                ConfigOptions.PocketICBM.EnableEdit.Value &&
+                (ConfigOptions.PocketICBM.ChangeATGEffect.Value && addMissileProc || ConfigOptions.PocketICBM.ChangeArmedBackpackEffect.Value && !addMissileProc)
+            )
             {
                 missileOrb.damageValue *= PocketICBM.GetICBMDamageMult(attackerBody);
             }

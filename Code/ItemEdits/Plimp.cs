@@ -11,7 +11,7 @@ using RoR2;
 namespace LordsItemEdits.ItemEdits
 {
     [MonoDetourTargets(typeof(GlobalEventManager))]
-    internal class Plimp
+    internal static class Plimp
     {
         [MonoDetourHookInitialize]
         internal static void Setup()

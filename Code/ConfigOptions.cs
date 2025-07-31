@@ -10,6 +10,8 @@ namespace LordsItemEdits
     {
         public static class SS2Items
         {
+            public static ConfigEntry<bool> HookForBetaVersion;
+
             public static class ArmedBackpack
             {
                 public static ConfigEntry<bool> EnableEdit;
@@ -18,12 +20,13 @@ namespace LordsItemEdits
             public static class ErraticGadget
             {
                 public static ConfigEntry<bool> EnableEdit;
+                public static ConfigEntry<bool> EnableProcChainingFix;
             }
         }
 
         public static class VoidDios
         {
-            public static ConfigEntry<bool> EnableVoidDiosEdit;
+            public static ConfigEntry<bool> EnableEdit;
             public static ConfigEntry<bool> AllowRespawnAsVoidReaver;
         }
 
@@ -34,10 +37,10 @@ namespace LordsItemEdits
 
         public static class PocketICBM
         {
+            public static ConfigEntry<bool> EnableEdit;
             public static ConfigEntry<bool> ChangeATGEffect;
             public static ConfigEntry<bool> ChangeArmedBackpackEffect;
-            public static ConfigEntry<bool> ChangeDMLEffect;
-            public static ConfigEntry<bool> ChangeEngiHarpoonEffect;
+            public static ConfigEntry<bool> ChangeGenericMissileEffect;
             public static ConfigEntry<bool> ChangePlasmaShrimpEffect;
             public static ConfigEntry<bool> ChangeRocketSurvivorEffect;
             public static ConfigEntry<bool> ChangeRiskyTweaksScrapLauncherEffect;
@@ -48,9 +51,30 @@ namespace LordsItemEdits
             public static ConfigEntry<bool> EnableEdit;
         }
 
+        public static class Planula
+        {
+            public static ConfigEntry<bool> EnableEdit;
+        }
+
+        public static class ElectricBoomerang
+        {
+            public static ConfigEntry<bool> EnableEdit;
+        }
+
+        public static class MoltenPerforator
+        {
+            public static ConfigEntry<bool> EnableEdit;
+        }
+
+        public static class ExecutiveCard
+        {
+            public static ConfigEntry<bool> EnableEdit;
+            public static ConfigEntry<bool> AddCreditCardToBottledChaos;
+        }
+
         internal static void BindConfigOptions(ConfigFile config)
         {
-            VoidDios.EnableVoidDiosEdit = config.BindOption(
+            VoidDios.EnableEdit = config.BindOption(
                 "Pluripotent Larva",
                 "Enable edit",
                 "Enable the Pluripotent Larva edit?",
@@ -68,58 +92,58 @@ namespace LordsItemEdits
             ATG.EnableEdit = config.BindOption(
                 "ATG",
                 "Enable edit",
-                "Enable the ATG edit which makes it fire like plasma shrimp? Will help performance!",
+                "Enable the ATG edit which makes it fire like plasma shrimp? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
 
 
+            PocketICBM.EnableEdit = config.BindOption(
+                "Pocket ICBM",
+                "Enable Edit",
+                "Enable the Pocket I.C.B.M edit that triples missile damage instead of firing 2 extra missiles? This will help performance! Disabling this will also disable all effect options below.",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );
             PocketICBM.ChangeArmedBackpackEffect = config.BindOption(
                 "Pocket ICBM",
                 "Change Armed Backpack Effect",
-                "Make Armed Backpack's ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Make Armed Backpack's ICBM effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
             PocketICBM.ChangeATGEffect = config.BindOption(
                 "Pocket ICBM",
                 "Change ATG Effect",
-                "Make ATG's ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Make ATG's ICBM effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
-            PocketICBM.ChangeDMLEffect = config.BindOption(
+            PocketICBM.ChangeGenericMissileEffect = config.BindOption(
                 "Pocket ICBM",
-                "Change Disposable Missile Launcher Effect",
-                "Make DML's ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
-                true,
-                Extensions.ConfigFlags.RestartRequired
-            );
-            PocketICBM.ChangeEngiHarpoonEffect = config.BindOption(
-                "Pocket ICBM",
-                "Change Engineer Harpoons Skill Effect",
-                "Make Engineer's Harpoons skill's ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Change Effect for generic missiles",
+                "Make DML's and Engineer Harpoons' ICBM effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
             PocketICBM.ChangePlasmaShrimpEffect = config.BindOption(
                 "Pocket ICBM",
                 "Change Plasma Shrimp Effect",
-                "Make Plasma Shrimp's ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Make Plasma Shrimp's ICBM effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
             PocketICBM.ChangeRocketSurvivorEffect = config.BindOption(
                 "Pocket ICBM",
                 "Change The Rocket Survivor Effect",
-                "Make Rocket's ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Make Rocket's ICBM effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
             PocketICBM.ChangeRiskyTweaksScrapLauncherEffect = config.BindOption(
                 "Pocket ICBM",
                 "Change RiskyTweaks MUL-T Scrap Launcher Effect",
-                "Make RiskyTweaks' MUL-T scrap launcher ICBM synergy effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Make RiskyTweaks' MUL-T scrap launcher ICBM synergy effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
@@ -134,10 +158,62 @@ namespace LordsItemEdits
             );
 
 
+            /*Planula.EnableEdit = config.BindOption(
+                "Planula",
+                "Enable Edit",
+                "Enable the Planula edit that makes it only proc on stunning skill hits?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );*/
+
+
+            /*ElectricBoomerang.EnableEdit = config.BindOption(
+                "Electric Boomerang",
+                "Enable Edit",
+                "Enable the Electric Boomerang edit that entirely changes what the item does?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );*/
+
+
+            MoltenPerforator.EnableEdit = config.BindOption(
+                "Molten Perforator",
+                "Enable Edit",
+                "Enable the Molten Perforator edit?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );
+
+
+            ExecutiveCard.EnableEdit = config.BindOption(
+                "Executive Card",
+                "Enable Edit",
+                "Enable the Executive Card edit that makes it more like a normal equipment?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );
+            ExecutiveCard.AddCreditCardToBottledChaos = config.BindOption(
+                "Executive Card",
+                "Add edited effect to the Bottled Chaos pool",
+                "Should the new effect for Executive Card be added to the equipment effect pool for Bottled Chaos?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );
+
+
+            SS2Items.HookForBetaVersion = config.BindOption(
+                "Starstorm 2",
+                "Hook for beta version",
+                "Enable this if you're running the beta version of SS2, otherwise the SS2 item edits will not work!",
+                false,
+                Extensions.ConfigFlags.RestartRequired
+            );
+
+
             SS2Items.ArmedBackpack.EnableEdit = config.BindOption(
                 "Starstorm 2 - Armed Backpack",
                 "Enable edit",
-                "Enable the Armed Backpack edit that makes the missile fire like plasma shrimp AND make the ICBM effect triple missile damage instead of firing 2 extra missiles? Will help performance!",
+                "Enable the Armed Backpack edit that makes the missile fire like plasma shrimp AND make the ICBM effect triple missile damage instead of firing 2 extra missiles? This will help performance!",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );
@@ -146,7 +222,14 @@ namespace LordsItemEdits
             SS2Items.ErraticGadget.EnableEdit = config.BindOption(
                 "Starstorm 2 - Erratic Gadget",
                 "Turn double procs into double damage",
-                "Make affected lightning procs deal double damage instead of proccing twice? Will help performance!",
+                "Make affected lightning procs deal double damage instead of proccing twice? This will help performance!",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );
+            SS2Items.ErraticGadget.EnableProcChainingFix = config.BindOption(
+                "Starstorm 2 - Erratic Gadget",
+                "Fix possible proc chaining with itself and other items",
+                "If you really wanna turn off this fix (you really shouldn't!), then disable this.",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );

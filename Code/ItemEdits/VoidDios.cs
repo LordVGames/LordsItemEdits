@@ -1,6 +1,7 @@
 ﻿using MiscFixes.Modules;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using R2API;
 using RoR2;
 using RoR2.CharacterAI;
 using RoR2.ContentManagement;
@@ -45,11 +46,12 @@ namespace LordsItemEdits.ItemEdits
 
         internal static void Setup()
         {
-            if (!ConfigOptions.VoidDios.EnableVoidDiosEdit.Value)
+            if (!ConfigOptions.VoidDios.EnableEdit.Value)
             {
                 return;
             }
 
+            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("VoidDios"));
             AssignMasterPrefabs();
             EditVoidBodyPrefabs();
             EditItemPrefabs();

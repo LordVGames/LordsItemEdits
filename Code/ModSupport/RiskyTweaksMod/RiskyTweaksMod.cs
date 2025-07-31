@@ -4,7 +4,7 @@ using System.Text;
 
 namespace LordsItemEdits.ModSupport.RiskyTweaksMod
 {
-    internal class RiskyTweaksMod
+    internal static class RiskyTweaksMod
     {
         internal const string GUID = "com.Moffein.RiskyTweaks";
         private static bool? _enabled;

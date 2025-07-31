@@ -12,7 +12,7 @@ using LordsItemEdits.MultiItemEdits;
 namespace LordsItemEdits.ModSupport.Starstorm2
 {
     [MonoDetourTargets(typeof(SS2.Items.ArmedBackpack.Behavior))]
-    internal class ArmedBackpack
+    internal static class ArmedBackpack
     {
         [MonoDetourHookInitialize]
         internal static void Setup()
@@ -31,26 +31,60 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             ILLabel skipFireMissile = w.DefineLabel();
 
 
-            w.MatchRelaxed(
-                x => x.MatchLdloc(2),
-                x => x.MatchMul(),
-                x => x.MatchStloc(3) && w.SetCurrentTo(x)
-            ).ThrowIfFailure()
-            .InsertAfterCurrent(
-                w.Create(OpCodes.Ldloc_3),
-                w.Create(OpCodes.Ldarg_1),
-                w.CreateCall(FireMissileOrbIfApplicable),
-                w.Create(OpCodes.Brtrue, skipFireMissile)
-            );
+            if (ConfigOptions.SS2Items.HookForBetaVersion.Value)
+            {
+                // going to after line:
+                // float num4 = victimBody.damage * num3;
+                w.MatchRelaxed(
+                    x => x.MatchLdloc(5),
+                    x => x.MatchMul(),
+                    x => x.MatchStloc(6) && w.SetCurrentTo(x)
+                ).ThrowIfFailure()
+                .InsertAfterCurrent(
+                    w.Create(OpCodes.Ldloc, 6),
+                    w.Create(OpCodes.Ldarg_1),
+                    w.CreateCall(FireMissileOrbIfApplicable),
+                    w.Create(OpCodes.Brtrue, skipFireMissile)
+                );
 
 
-            w.MatchRelaxed(
-                x => x.MatchCall("RoR2.MissileUtils", "FireMissile") && w.SetCurrentTo(x),
-                x => x.MatchRet()
-            ).ThrowIfFailure()
-            .MarkLabelToCurrentNext(skipFireMissile);
+                // going to before line:
+                // MissileUtils.FireMissile
+                w.MatchRelaxed(
+                    x => x.MatchCall("RoR2.MissileUtils", "FireMissile") && w.SetCurrentTo(x),
+                    // why does nop even exist???
+                    x => x.MatchNop(),
+                    x => x.MatchNop(),
+                    x => x.MatchNop(),
+                    x => x.MatchRet()
+                ).ThrowIfFailure()
+                .MarkLabelToCurrentNext(skipFireMissile);
+            }
+            else
+            {
+                // going to after line:
+                // float num3 = victimBody.damage * num2;
+                w.MatchRelaxed(
+                    x => x.MatchLdloc(2),
+                    x => x.MatchMul(),
+                    x => x.MatchStloc(3) && w.SetCurrentTo(x)
+                ).ThrowIfFailure()
+                .InsertAfterCurrent(
+                    w.Create(OpCodes.Ldloc_3),
+                    w.Create(OpCodes.Ldarg_1),
+                    w.CreateCall(FireMissileOrbIfApplicable),
+                    w.Create(OpCodes.Brtrue, skipFireMissile)
+                );
 
 
+                // going to before line:
+                // MissileUtils.FireMissile
+                w.MatchRelaxed(
+                    x => x.MatchCall("RoR2.MissileUtils", "FireMissile") && w.SetCurrentTo(x),
+                    x => x.MatchRet()
+                ).ThrowIfFailure()
+                .MarkLabelToCurrentNext(skipFireMissile);
+            }
             //w.LogILInstructions();
         }
 

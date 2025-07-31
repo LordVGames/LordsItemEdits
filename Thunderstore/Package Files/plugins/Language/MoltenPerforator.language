@@ -1,0 +1,10 @@
+{
+  "strings": {
+    "ITEM_FIREBALLSONHIT_PICKUP": "Chance on hit to make an enemy spontaneously combust.",
+    "ITEM_FIREBALLSONHIT_DESC": "<style=cIsDamage>10%</style> chance on hit to make an enemy <style=cIsDamage>spontaneously combust</style>, dealing <style=cIsDamage>200% <style=cStack>(+120% per stack)</style></style> TOTAL damage and <style=cIsDamage>igniting</style> ALL enemies in a <style=cIsDamage>16m</style> radius, which scales based on <style=cIsUtility>enemy size</style>."
+  },
+  "en": {
+    "ITEM_FIREBALLSONHIT_PICKUP": "Chance on hit to make an enemy spontaneously combust.",
+    "ITEM_FIREBALLSONHIT_DESC": "<style=cIsDamage>10%</style> chance on hit to make an enemy <style=cIsDamage>spontaneously combust</style>, dealing <style=cIsDamage>200% <style=cStack>(+120% per stack)</style></style> TOTAL damage and <style=cIsDamage>igniting</style> ALL enemies in a <style=cIsDamage>16m</style> radius, which scales based on <style=cIsUtility>enemy size</style>."
+  }
+}

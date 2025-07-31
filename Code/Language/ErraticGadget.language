@@ -1,0 +1,10 @@
+{
+  "strings": {
+    "SS2_ITEM_ERRATICGADGET_PICKUP": "Your lightning strikes deal double damage. Chance to fire chain lightning on hit.",
+    "SS2_ITEM_ERRATICGADGET_DESC": "Your lightning strikes deal <style=cIsDamage>2x</style> damage. <style=cIsDamage>10%</style> chance on hit to fire <style=cIsDamage>chain lightning</style> for <style=cIsDamage>300%</style> TOTAL damage on up to <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> targets."
+  },
+  "en": {
+    "SS2_ITEM_ERRATICGADGET_PICKUP": "Your lightning items deal double damage. Chance to fire chain lightning on hit.",
+    "SS2_ITEM_ERRATICGADGET_DESC": "Your lightning strikes deal <style=cIsDamage>2x</style> damage. <style=cIsDamage>10%</style> chance on hit to fire <style=cIsDamage>chain lightning</style> for <style=cIsDamage>300%</style> TOTAL damage on up to <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> targets."
+  }
+}

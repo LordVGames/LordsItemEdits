@@ -1,16 +1,18 @@
-﻿using System;
+﻿using MiscFixes.Modules;
+using Mono.Cecil.Cil;
+using MonoDetour;
+using MonoDetour.Cil;
+using MonoDetour.DetourTypes;
+using MonoDetour.HookGen;
+using MonoMod.Cil;
+using R2API;
+using RoR2;
+using RoR2.Orbs;
+using SS2;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoDetour;
-using MonoDetour.HookGen;
-using MonoDetour.DetourTypes;
-using MonoDetour.Cil;
 using UnityEngine;
-using RoR2;
-using SS2;
-using RoR2.Orbs;
 
 namespace LordsItemEdits.ModSupport.Starstorm2
 {
@@ -20,9 +22,14 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            MonoDetourHooks.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
+            if (ConfigOptions.SS2Items.ErraticGadget.EnableProcChainingFix.Value && !ConfigOptions.SS2Items.HookForBetaVersion.Value)
+            {
+                // this is apparently fixed in the official beta so it's toggleable
+                MonoDetourHooks.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
+            }
             if (ConfigOptions.SS2Items.ErraticGadget.EnableEdit.Value)
             {
+                LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("ErraticGadget"));
                 MonoDetourHooks.SS2.Items.ErraticGadget.LightningOrb_OnArrival.ILHook(SkipDoublingProc);
                 MonoDetourHooks.SS2.Items.ErraticGadget.LightningStrikeOrb_OnArrival.ControlFlowPrefix(LightningStrikeOrb_JustDoubleDamage);
                 MonoDetourHooks.SS2.Items.ErraticGadget.SimpleLightningStrikeOrb_OnArrival.ControlFlowPrefix(SimpleLightningStrikeOrb_JustDoubleDamage);
@@ -38,26 +45,24 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             ILLabel skipStupid = w.DefineLabel();
 
 
+            // going in front of line:
+            // gadgetLightningOrb.procChainMask = default(ProcChainMask);
             w.MatchRelaxed(
                 x => x.MatchLdloc(1) && w.SetCurrentTo(x),
                 x => x.MatchLdflda(out _),
                 x => x.MatchInitobj(out _)
-            ).ThrowIfFailure();
-            w.InsertBeforeCurrent(
+            ).ThrowIfFailure()
+            .InsertBeforeCurrent(
                 w.Create(OpCodes.Br, skipStupid)
-            );
+            )
 
 
-            /*w.MatchRelaxed(
-                x => x.MatchLdloc(1),
-                x => x.MatchLdflda(out _),
-                x => x.MatchInitobj(out _) && w.SetCurrentTo(x)
-            ).ThrowIfFailure();*/
-            w.CurrentToNext();
-            w.CurrentToNext();
-            w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_1));
-            w.MarkLabelToCurrent(skipStupid);
-            w.InsertAfterCurrent(
+            // going past line above
+            .CurrentToNext()
+            .CurrentToNext()
+            .InsertAfterCurrent(w.Create(OpCodes.Ldarg_1))
+            .MarkLabelToCurrent(skipStupid)
+            .InsertAfterCurrent(
                 w.Create(OpCodes.Ldloc_1),
                 w.CreateCall(ActuallySetProcChainMask)
             );
@@ -74,32 +79,68 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             ILLabel skipDoublingProc = w.DefineLabel();
 
 
-            // next 2 blocks are to skip over the part where lightning is doubled
-            // going to before "bool orbFoundNewTarget = false;"
-            w.MatchRelaxed(
-                x => x.MatchLdcI4(0) && w.SetCurrentTo(x),
-                x => x.MatchStloc(0)
-            ).ThrowIfFailure();
-            w.InsertBeforeCurrentStealLabels(
-                w.Create(OpCodes.Br, skipDoublingProc)
-            );
+            if (ConfigOptions.SS2Items.HookForBetaVersion.Value)
+            {
+                // next 2 blocks are to skip over the part where lightning is doubled
+                // going to before "bool flag2 = false;"
+                w.MatchRelaxed(
+                    x => x.MatchLdcI4(0) && w.SetCurrentTo(x),
+                    x => x.MatchStloc(0)
+                ).ThrowIfFailure();
+                w.InsertBeforeCurrentStealLabels(
+                    w.Create(OpCodes.Br, skipDoublingProc)
+                );
 
 
-            // going to before "orig.Invoke(self);"
-            w.MatchRelaxed(
-                x => x.MatchLdcI4(1),
-                x => x.MatchSub(),
-                x => x.MatchCallvirt(out _) && w.SetCurrentTo(x),
-                x => x.MatchLdarg(1),
-                x => x.MatchLdarg(2)
-            ).ThrowIfFailure();
-            w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_2));
-            w.MarkLabelToCurrent(skipDoublingProc);
-            w.InsertAfterCurrent(
-                w.CreateCall(DealDoubleDamage)
-            );
+                // going to before:
+                // orig.Invoke(self);
+                // by matching after this line:
+                // self.bouncedObjects.RemoveAt(self.bouncedObjects.Count - 1);
+                w.MatchRelaxed(
+                    x => x.MatchLdcI4(1),
+                    x => x.MatchSub(),
+                    x => x.MatchCallvirt(out _) && w.SetCurrentTo(x),
+                    x => x.MatchNop(),
+                    x => x.MatchNop(),
+                    x => x.MatchLdarg(1),
+                    x => x.MatchLdarg(2)
+                ).ThrowIfFailure();
+                w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_2));
+                w.MarkLabelToCurrent(skipDoublingProc);
+                w.InsertAfterCurrent(
+                    w.CreateCall(DealDoubleDamage)
+                );
+            }
+            else
+            {
+                // next 2 blocks are to skip over the part where lightning is doubled
+                // going to before "bool flag = false;"
+                w.MatchRelaxed(
+                    x => x.MatchLdcI4(0) && w.SetCurrentTo(x),
+                    x => x.MatchStloc(0)
+                ).ThrowIfFailure();
+                w.InsertBeforeCurrentStealLabels(
+                    w.Create(OpCodes.Br, skipDoublingProc)
+                );
 
 
+                // going to before:
+                // orig.Invoke(self);
+                // by matching after this line:
+                // self.bouncedObjects.RemoveAt(self.bouncedObjects.Count - 1);
+                w.MatchRelaxed(
+                    x => x.MatchLdcI4(1),
+                    x => x.MatchSub(),
+                    x => x.MatchCallvirt(out _) && w.SetCurrentTo(x),
+                    x => x.MatchLdarg(1),
+                    x => x.MatchLdarg(2)
+                ).ThrowIfFailure();
+                w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_2));
+                w.MarkLabelToCurrent(skipDoublingProc);
+                w.InsertAfterCurrent(
+                    w.CreateCall(DealDoubleDamage)
+                );
+            }
             //w.LogILInstructions();
         }
         private static void DealDoubleDamage(LightningOrb lightningOrb)

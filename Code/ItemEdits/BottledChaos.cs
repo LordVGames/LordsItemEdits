@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Mono.Cecil.Cil;
+using MonoDetour;
+using MonoDetour.Cil;
+using MonoDetour.HookGen;
+using MonoMod.Cil;
+using R2API;
+using RoR2;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using MonoDetour;
-using MonoDetour.HookGen;
-using MonoDetour.Cil;
-using RoR2;
 
 namespace LordsItemEdits.ItemEdits
 {
     [MonoDetourTargets(typeof(Inventory))]
-    internal class BottledChaos
+    internal static class BottledChaos
     {
         [MonoDetourHookInitialize]
         internal static void Setup()
@@ -21,6 +22,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
+            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("BottledChaos"));
             MonoDetourHooks.RoR2.Inventory.CalculateEquipmentCooldownScale.ILHook(SetupBhaosCooldownReduction);
         }
 

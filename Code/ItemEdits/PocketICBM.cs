@@ -1,7 +1,8 @@
-﻿using System;
+﻿using R2API;
+using RoR2;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using RoR2;
 
 namespace LordsItemEdits.ItemEdits
 {
@@ -9,6 +10,17 @@ namespace LordsItemEdits.ItemEdits
     {
         private const float _initialMult = 3f;
         private const float _stackMult = 1.5f;
+
+        internal static void Setup()
+        {
+            if (!ConfigOptions.PocketICBM.EnableEdit.Value)
+            {
+                return;
+            }
+
+            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("PocketICBM"));
+            // other effects of ICBM are handled in their respective files
+        }
 
         public static float GetICBMDamageMult(CharacterBody characterBody)
         {

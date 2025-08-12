@@ -14,7 +14,7 @@ namespace LordsItemEdits
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "LordVGames";
         public const string PluginName = "LordsItemEdits";
-        public const string PluginVersion = "0.2.1";
+        public const string PluginVersion = "0.3.0";
 
         public void Awake()
         {
@@ -32,6 +32,8 @@ namespace LordsItemEdits
             //ItemEdits.Planula.Setup();
             ItemEdits.ExecutiveCard.Setup();
             ItemEdits.PocketICBM.Setup();
+            ItemEdits.Polylute.Setup();
+            ItemEdits.ElectricBoomerang.Setup();
 
             if (ModSupport.Starstorm2.Starstorm2Mod.ModIsRunning)
             {

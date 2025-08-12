@@ -1,7 +1,15 @@
+## 0.3.0
+
+- Polylute
+- - Made it stack damage instead of hit count (another change to help late-game performance)
+
+- Electric Boomerang
+- - Got a damage buff, travels further and faster, and is guranteed to proc off of skills that can stun (meant to synergize with those stunning skills instead of being a perma-stun and proc chain beast)
+
 ## 0.2.1
 
-Changed package description (forgot to earlier)
-- I'll update the icon later idc rn
+- Changed package description (forgot to earlier)
+- - I'll update the icon later idc rn
 
 ## 0.2.0
 

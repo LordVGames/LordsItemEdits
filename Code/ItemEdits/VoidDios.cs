@@ -35,7 +35,7 @@ namespace LordsItemEdits.ItemEdits
         private static GameObject _devastatorAllyMasterPrefab;
         private static readonly AssetReferenceT<GameObject> _devastatorAllyBodyPrefabReference = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC1_VoidMegaCrab.VoidMegaCrabAllyBody_prefab);
 
-        private static readonly FixedConditionalWeakTable<CharacterMaster, LieVoidDiosInfo> _lieVoidDiosTable = [];
+        private static readonly FixedConditionalWeakTable<CharacterMaster, LieVoidDiosInfo> _lieVoidDiosInfoTable = [];
         private class LieVoidDiosInfo
         {
             internal GameObject OriginalBodyPrefab;
@@ -165,9 +165,9 @@ namespace LordsItemEdits.ItemEdits
             c.Emit(OpCodes.Ldarg_0);
             c.EmitDelegate<Action<CharacterMaster>>((characterMaster) =>
             {
-                if (!_lieVoidDiosTable.TryGetValue(characterMaster, out _))
+                if (!_lieVoidDiosInfoTable.TryGetValue(characterMaster, out _))
                 {
-                    _lieVoidDiosTable.Add(characterMaster, new LieVoidDiosInfo { OriginalBodyPrefab = characterMaster.bodyPrefab, NameOfSceneFirstRevivedIn = SceneManager.GetActiveScene().name });
+                    _lieVoidDiosInfoTable.Add(characterMaster, new LieVoidDiosInfo { OriginalBodyPrefab = characterMaster.bodyPrefab, NameOfSceneFirstRevivedIn = SceneManager.GetActiveScene().name });
                     Log.Info($"Giving {characterMaster.GetBody()?.name} a CutHp due to them using up a void dios for the first time this stage");
                     characterMaster.inventory?.GiveItem(_cutHpItemDef.itemIndex);
                 }
@@ -220,7 +220,7 @@ namespace LordsItemEdits.ItemEdits
                 orig(self);
                 return;
             }
-            if (!_lieVoidDiosTable.TryGetValue(self.master, out var lieVoidDiosInfo))
+            if (!_lieVoidDiosInfoTable.TryGetValue(self.master, out var lieVoidDiosInfo))
             {
                 orig(self);
                 return;
@@ -234,7 +234,7 @@ namespace LordsItemEdits.ItemEdits
 
 
             self.master.bodyPrefab = lieVoidDiosInfo.OriginalBodyPrefab;
-            _lieVoidDiosTable.Remove(self.master);
+            _lieVoidDiosInfoTable.Remove(self.master);
             if (self.master.inventory != null)
             {
                 if (self.master.inventory.GetItemCount(_cutHpItemDef.itemIndex) > 0)

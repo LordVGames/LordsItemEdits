@@ -72,6 +72,11 @@ namespace LordsItemEdits
             public static ConfigEntry<bool> AddCreditCardToBottledChaos;
         }
 
+        public static class Polylute
+        {
+            public static ConfigEntry<bool> EnableEdit;
+        }
+
         internal static void BindConfigOptions(ConfigFile config)
         {
             VoidDios.EnableEdit = config.BindOption(
@@ -167,13 +172,13 @@ namespace LordsItemEdits
             );*/
 
 
-            /*ElectricBoomerang.EnableEdit = config.BindOption(
+            ElectricBoomerang.EnableEdit = config.BindOption(
                 "Electric Boomerang",
                 "Enable Edit",
                 "Enable the Electric Boomerang edit that entirely changes what the item does?",
                 true,
                 Extensions.ConfigFlags.RestartRequired
-            );*/
+            );
 
 
             MoltenPerforator.EnableEdit = config.BindOption(
@@ -196,6 +201,15 @@ namespace LordsItemEdits
                 "Executive Card",
                 "Add edited effect to the Bottled Chaos pool",
                 "Should the new effect for Executive Card be added to the equipment effect pool for Bottled Chaos?",
+                true,
+                Extensions.ConfigFlags.RestartRequired
+            );
+
+
+            Polylute.EnableEdit = config.BindOption(
+                "Polylute",
+                "Enable Edit",
+                "Enable the Polylute edit that makes it stack damage instead of hit amount?",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );

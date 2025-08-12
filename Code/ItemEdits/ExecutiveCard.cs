@@ -40,17 +40,15 @@ namespace LordsItemEdits.ItemEdits
 
             internal static void SetupBuff()
             {
-                bdCreditScore = new BuffDef
-                {
-                    name = "bdCreditScore",
-                    buffColor = Color.white,
-                    canStack = true,
-                    isDebuff = false,
-                    flags = BuffDef.Flags.ExcludeFromNoxiousThorns,
-                    ignoreGrowthNectar = true,
-                    // idek if this works lmao
-                    startSfx = CreateNetworkSoundEventDef("Play_item_proc_moneyOnKill_loot"),
-                };
+                bdCreditScore = ScriptableObject.CreateInstance<BuffDef>();
+                bdCreditScore.name = "bdCreditScore";
+                bdCreditScore.buffColor = Color.white;
+                bdCreditScore.canStack = true;
+                bdCreditScore.isDebuff = false;
+                bdCreditScore.flags = BuffDef.Flags.ExcludeFromNoxiousThorns;
+                bdCreditScore.ignoreGrowthNectar = true;
+                // idek if this works lmao
+                bdCreditScore.startSfx = CreateNetworkSoundEventDef("Play_item_proc_moneyOnKill_loot");
                 AssetAsyncReferenceManager<Sprite>.LoadAsset(_creditCardIconSpriteReference).Completed += (handle) =>
                 {
                     bdCreditScore.iconSprite = handle.Result;

@@ -23,7 +23,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("ExecutiveCard"));
+            ModLanguage.LangFilesToLoad.Add("ExecutiveCard");
             CreditScoreBuff.SetupBuff();
             EquipmentDefEdits.Setup();
             ILHooks.Setup();

@@ -2,9 +2,5 @@
   "strings": {
     "ITEM_RANDOMEQUIPMENTTRIGGER_PICKUP": "Greatly reduce equipment cooldown. Activating your Equipment triggers an additional, random Equipment effect.",
     "ITEM_RANDOMEQUIPMENTTRIGGER_DESC": "<style=cIsUtility>Reduce equipment cooldown</style> by <style=cIsUtility>35%</style>. Trigger a <style=cIsDamage>random equipment</style> effect <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> time(s)."
-  },
-  "en": {
-    "ITEM_RANDOMEQUIPMENTTRIGGER_PICKUP": "Greatly reduce equipment cooldown. Activating your Equipment triggers an additional, random Equipment effect.",
-    "ITEM_RANDOMEQUIPMENTTRIGGER_DESC": "<style=cIsUtility>Reduce equipment cooldown</style> by <style=cIsUtility>35%</style>. Trigger a <style=cIsDamage>random equipment</style> effect <style=cIsDamage>1</style> <style=cStack>(+1 per stack)</style> time(s)."
   }
 }

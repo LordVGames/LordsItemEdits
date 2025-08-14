@@ -14,7 +14,7 @@ namespace LordsItemEdits
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "LordVGames";
         public const string PluginName = "LordsItemEdits";
-        public const string PluginVersion = "0.3.0";
+        public const string PluginVersion = "0.3.2";
 
         public void Awake()
         {
@@ -50,6 +50,8 @@ namespace LordsItemEdits
             {
                 ModSupport.RiskyTweaksMod.MulTScrapLauncherSynergyEdit.Setup();
             }
+
+            ModLanguage.AddNewLangTokens();
         }
     }
 }

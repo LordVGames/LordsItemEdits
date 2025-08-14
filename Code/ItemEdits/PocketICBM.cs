@@ -18,7 +18,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("PocketICBM"));
+            ModLanguage.LangFilesToLoad.Add("PocketICBM");
             // other effects of ICBM are handled in their respective files
         }
 

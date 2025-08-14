@@ -22,7 +22,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("Polylute"));
+            ModLanguage.LangFilesToLoad.Add("Polylute");
             MonoDetourHooks.RoR2.GlobalEventManager.ProcessHitEnemy.ILHook(SwapStackingHitsForDamage);
         }
 

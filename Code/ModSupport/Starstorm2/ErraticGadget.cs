@@ -29,7 +29,7 @@ namespace LordsItemEdits.ModSupport.Starstorm2
             }
             if (ConfigOptions.SS2Items.ErraticGadget.EnableEdit.Value)
             {
-                LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("ErraticGadget"));
+                ModLanguage.LangFilesToLoad.Add("ErraticGadget");
                 MonoDetourHooks.SS2.Items.ErraticGadget.LightningOrb_OnArrival.ILHook(SkipDoublingProc);
                 MonoDetourHooks.SS2.Items.ErraticGadget.LightningStrikeOrb_OnArrival.ControlFlowPrefix(LightningStrikeOrb_JustDoubleDamage);
                 MonoDetourHooks.SS2.Items.ErraticGadget.SimpleLightningStrikeOrb_OnArrival.ControlFlowPrefix(SimpleLightningStrikeOrb_JustDoubleDamage);

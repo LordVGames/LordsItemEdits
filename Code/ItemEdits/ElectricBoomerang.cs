@@ -26,6 +26,7 @@ namespace LordsItemEdits.ItemEdits
         private const float _damagePerHit = 3f;
         private const float _damagePerHitStack = 2f;
         private static readonly AssetReferenceT<GameObject> _electricBoomerangProjectileAsset = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC2_Items_StunAndPierce.StunAndPierceBoomerang_prefab);
+        private static readonly AssetReferenceT<ItemDef> _electricBoomerangItemDef = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC2_Items_StunAndPierce.StunAndPierce_asset);
         private static readonly FixedConditionalWeakTable<GameObject, LieElectricBoomerangInfo> _lieElectricBoomerangInfoTable = [];
         private class LieElectricBoomerangInfo
         {
@@ -42,9 +43,10 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("ElectricBoomerang"));
-            On.RoR2.GlobalEventManager.ProcessHitEnemy += GlobalEventManager_ProcessHitEnemy;
+            ModLanguage.LangFilesToLoad.Add("ElectricBoomerang");
             EditBoomerangProjectile();
+            AIBlacklistNewBoomerang();
+            On.RoR2.GlobalEventManager.ProcessHitEnemy += GlobalEventManager_ProcessHitEnemy;
             MonoDetourHooks.RoR2.GlobalEventManager.ProcessHitEnemy.ILHook(MakeBoomerangBetter);
             MonoDetourHooks.RoR2.Projectile.BoomerangProjectile.FixedUpdate.ILHook(InsertRemoveProjectileOwnerFromFiredList);
         }
@@ -82,6 +84,19 @@ namespace LordsItemEdits.ItemEdits
                 handle.Result.TryDestroyComponent<ProjectileOverlapAttack>();
 
                 AssetAsyncReferenceManager<GameObject>.UnloadAsset(_electricBoomerangProjectileAsset);
+            };
+        }
+
+
+
+        private static void AIBlacklistNewBoomerang()
+        {
+            AssetAsyncReferenceManager<ItemDef>.LoadAsset(_electricBoomerangItemDef).Completed += (handle) =>
+            {
+                // make it ai blacklisted since players can't be stunned
+                ItemDef electricBoomerangItemDef = handle.Result;
+                electricBoomerangItemDef.tags = [.. electricBoomerangItemDef.tags, ItemTag.AIBlacklist];
+                AssetAsyncReferenceManager<ItemDef>.UnloadAsset(_electricBoomerangItemDef);
             };
         }
 

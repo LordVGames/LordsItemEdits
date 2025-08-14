@@ -1,3 +1,13 @@
+## 0.3.2
+
+- All items
+- - Fixed description edits still applying if an item's edit is disabled
+
+## 0.3.1
+
+- Electric Boomerang
+- - Blacklisted it from enemies since players can't be stunned
+
 ## 0.3.0
 
 - Polylute

@@ -22,7 +22,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("BottledChaos"));
+            ModLanguage.LangFilesToLoad.Add("BottledChaos");
             MonoDetourHooks.RoR2.Inventory.CalculateEquipmentCooldownScale.ILHook(SetupBhaosCooldownReduction);
         }
 

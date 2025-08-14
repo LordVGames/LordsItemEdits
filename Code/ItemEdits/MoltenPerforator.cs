@@ -33,7 +33,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("MoltenPerforator"));
+            ModLanguage.LangFilesToLoad.Add("MoltenPerforator");
             Assets.Setup();
             Assets.LoadAssets();
             ILHook.Setup();

@@ -2,9 +2,5 @@
   "strings": {
     "EQUIPMENT_MULTISHOPCARD_PICKUP": "Gain 2 stacks of \"Credit Score\" on use. Making a purchase uses a stack and you gain 10% cash back. Multishops purchased also keep all other slots open.",
     "EQUIPMENT_MULTISHOPCARD_DESC": "On use, gain 2 stacks of <style=cShrine>Credit Score</style>. Whenever you make a gold purchase and have at least 1 stack of <style=cShrine>Credit Score</style>, spend a stack to get <style=cIsUtility>10%</style> of the spent gold back. If the purchase is a <style=cIsUtility>multishop</style> terminal, the other terminals will <style=cIsUtility>remain open</style>."
-  },
-  "en": {
-    "EQUIPMENT_MULTISHOPCARD_PICKUP": "Gain 2 stacks of \"Credit Score\" on use. Making a purchase uses a stack and you gain 10% cash back. Multishops purchased also keep all other slots open.",
-    "EQUIPMENT_MULTISHOPCARD_DESC": "On use, gain 2 stacks of <style=cShrine>Credit Score</style>. Whenever you make a gold purchase and have at least 1 stack of <style=cShrine>Credit Score</style>, spend a stack to get <style=cIsUtility>10%</style> of the spent gold back. If the purchase is a <style=cIsUtility>multishop</style> terminal, the other terminals will <style=cIsUtility>remain open</style>."
   }
 }

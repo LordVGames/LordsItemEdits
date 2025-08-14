@@ -1,8 +1,5 @@
 {
   "strings": {
     "ITEM_EXTRALIFEVOID_DESC": "<style=cIsUtility>Upon death</style>, this item will be <style=cIsUtility>consumed</style> and you will <style=cIsHealing>return to life</style> in a <style=cIsHealth>new body</style> that has <style=cIsHealth>-50% maximum health</style>. Return to your <style=cIsHealth>original body</style> in the next stage. <style=cIsVoid>Corrupts all Dio's Best Friends</style>."
-  },
-  "en": {
-    "ITEM_EXTRALIFEVOID_DESC": "<style=cIsUtility>Upon death</style>, this item will be <style=cIsUtility>consumed</style> and you will <style=cIsHealing>return to life</style> in a <style=cIsHealth>new body</style> that has <style=cIsHealth>-50% maximum health</style>. Return to your <style=cIsHealth>original body</style> in the next stage. <style=cIsVoid>Corrupts all Dio's Best Friends</style>."
   }
 }

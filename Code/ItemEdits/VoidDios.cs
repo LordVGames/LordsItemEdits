@@ -51,7 +51,7 @@ namespace LordsItemEdits.ItemEdits
                 return;
             }
 
-            LanguageAPI.AddOverlayPath(ModUtil.GetLangFileLocation("VoidDios"));
+            ModLanguage.LangFilesToLoad.Add("VoidDios");
             AssignMasterPrefabs();
             EditVoidBodyPrefabs();
             EditItemPrefabs();

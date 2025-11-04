@@ -10,8 +10,6 @@ namespace LordsItemEdits
     {
         public static class SS2Items
         {
-            public static ConfigEntry<bool> HookForBetaVersion;
-
             public static class ArmedBackpack
             {
                 public static ConfigEntry<bool> EnableEdit;
@@ -20,7 +18,6 @@ namespace LordsItemEdits
             public static class ErraticGadget
             {
                 public static ConfigEntry<bool> EnableEdit;
-                public static ConfigEntry<bool> EnableProcChainingFix;
             }
         }
 
@@ -215,15 +212,6 @@ namespace LordsItemEdits
             );
 
 
-            SS2Items.HookForBetaVersion = config.BindOption(
-                "Starstorm 2",
-                "Hook for beta version",
-                "Enable this if you're running the beta version of SS2, otherwise the SS2 item edits will not work!",
-                false,
-                Extensions.ConfigFlags.RestartRequired
-            );
-
-
             SS2Items.ArmedBackpack.EnableEdit = config.BindOption(
                 "Starstorm 2 - Armed Backpack",
                 "Enable edit",
@@ -237,13 +225,6 @@ namespace LordsItemEdits
                 "Starstorm 2 - Erratic Gadget",
                 "Turn double procs into double damage",
                 "Make affected lightning procs deal double damage instead of proccing twice? This will help performance!",
-                true,
-                Extensions.ConfigFlags.RestartRequired
-            );
-            SS2Items.ErraticGadget.EnableProcChainingFix = config.BindOption(
-                "Starstorm 2 - Erratic Gadget",
-                "Fix possible proc chaining with itself and other items",
-                "If you really wanna turn off this fix (you really shouldn't!), then disable this.",
                 true,
                 Extensions.ConfigFlags.RestartRequired
             );

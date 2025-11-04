@@ -7,6 +7,7 @@ namespace LordsItemEdits
     [BepInDependency(SS2.SS2Main.GUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(RocketSurvivor.RocketSurvivorPlugin.MODUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency(ModSupport.RiskyTweaksMod.RiskyTweaksMod.GUID, BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(ModSupport.WolfFixes.WolfFixesMod.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Plugin : BaseUnityPlugin
     {
@@ -14,7 +15,7 @@ namespace LordsItemEdits
         public const string PluginGUID = PluginAuthor + "." + PluginName;
         public const string PluginAuthor = "LordVGames";
         public const string PluginName = "LordsItemEdits";
-        public const string PluginVersion = "0.3.2";
+        public const string PluginVersion = "0.3.4";
 
         public void Awake()
         {

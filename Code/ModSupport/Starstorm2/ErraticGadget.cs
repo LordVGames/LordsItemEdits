@@ -22,11 +22,6 @@ namespace LordsItemEdits.ModSupport.Starstorm2
         [MonoDetourHookInitialize]
         internal static void Setup()
         {
-            // this is apparently fixed in the official beta
-            if (ConfigOptions.SS2Items.ErraticGadget.EnableProcChainingFix.Value && !ConfigOptions.SS2Items.HookForBetaVersion.Value)
-            {
-                MonoDetourHooks.SS2.Items.ErraticGadget.Behavior.OnDamageDealtServer.ILHook(FixProcChainingWithSelf);
-            }
             if (ConfigOptions.SS2Items.ErraticGadget.EnableEdit.Value)
             {
                 ModLanguage.LangFilesToLoad.Add("ErraticGadget");
@@ -39,109 +34,39 @@ namespace LordsItemEdits.ModSupport.Starstorm2
 
 
 
-        private static void FixProcChainingWithSelf(ILManipulationInfo info)
-        {
-            ILWeaver w = new(info);
-            ILLabel skipStupid = w.DefineLabel();
-
-
-            // going in front of line:
-            // gadgetLightningOrb.procChainMask = default(ProcChainMask);
-            w.MatchRelaxed(
-                x => x.MatchLdloc(1) && w.SetCurrentTo(x),
-                x => x.MatchLdflda(out _),
-                x => x.MatchInitobj(out _)
-            ).ThrowIfFailure()
-            .InsertBeforeCurrent(
-                w.Create(OpCodes.Br, skipStupid)
-            )
-
-
-            // going past line above
-            .CurrentToNext()
-            .CurrentToNext()
-            .InsertAfterCurrent(w.Create(OpCodes.Ldarg_1))
-            .MarkLabelToCurrent(skipStupid)
-            .InsertAfterCurrent(
-                w.Create(OpCodes.Ldloc_1),
-                w.CreateCall(ActuallySetProcChainMask)
-            );
-        }
-        private static void ActuallySetProcChainMask(DamageReport damageReport, SS2.Items.ErraticGadget.GadgetLightningOrb gadgetLightningOrb)
-        {
-            gadgetLightningOrb.procChainMask = damageReport.damageInfo.procChainMask;
-        }
-
-
         private static void SkipDoublingProc(ILManipulationInfo info)
         {
             ILWeaver w = new(info);
             ILLabel skipDoublingProc = w.DefineLabel();
 
 
-            if (ConfigOptions.SS2Items.HookForBetaVersion.Value)
-            {
-                // next 2 blocks are to skip over the part where lightning is doubled
-                // going to before "bool flag2 = false;"
-                w.MatchRelaxed(
-                    x => x.MatchLdcI4(0) && w.SetCurrentTo(x),
-                    x => x.MatchStloc(0)
-                ).ThrowIfFailure();
-                w.InsertBeforeCurrentStealLabels(
-                    w.Create(OpCodes.Br, skipDoublingProc)
-                );
+            // next 2 blocks are to skip over the part where lightning is doubled
+            // going to before "bool flag = false;"
+            w.MatchRelaxed(
+                x => x.MatchLdcI4(0) && w.SetCurrentTo(x),
+                x => x.MatchStloc(0)
+            ).ThrowIfFailure();
+            w.InsertBeforeCurrentStealLabels(
+                w.Create(OpCodes.Br, skipDoublingProc)
+            );
 
 
-                // going to before:
-                // orig.Invoke(self);
-                // by matching after this line:
-                // self.bouncedObjects.RemoveAt(self.bouncedObjects.Count - 1);
-                w.MatchRelaxed(
-                    x => x.MatchLdcI4(1),
-                    x => x.MatchSub(),
-                    x => x.MatchCallvirt(out _) && w.SetCurrentTo(x),
-                    x => x.MatchNop(),
-                    x => x.MatchNop(),
-                    x => x.MatchLdarg(1),
-                    x => x.MatchLdarg(2)
-                ).ThrowIfFailure();
-                w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_2));
-                w.MarkLabelToCurrent(skipDoublingProc);
-                w.InsertAfterCurrent(
-                    w.CreateCall(DealDoubleDamage)
-                );
-            }
-            else
-            {
-                // next 2 blocks are to skip over the part where lightning is doubled
-                // going to before "bool flag = false;"
-                w.MatchRelaxed(
-                    x => x.MatchLdcI4(0) && w.SetCurrentTo(x),
-                    x => x.MatchStloc(0)
-                ).ThrowIfFailure();
-                w.InsertBeforeCurrentStealLabels(
-                    w.Create(OpCodes.Br, skipDoublingProc)
-                );
-
-
-                // going to before:
-                // orig.Invoke(self);
-                // by matching after this line:
-                // self.bouncedObjects.RemoveAt(self.bouncedObjects.Count - 1);
-                w.MatchRelaxed(
-                    x => x.MatchLdcI4(1),
-                    x => x.MatchSub(),
-                    x => x.MatchCallvirt(out _) && w.SetCurrentTo(x),
-                    x => x.MatchLdarg(1),
-                    x => x.MatchLdarg(2)
-                ).ThrowIfFailure();
-                w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_2));
-                w.MarkLabelToCurrent(skipDoublingProc);
-                w.InsertAfterCurrent(
-                    w.CreateCall(DealDoubleDamage)
-                );
-            }
-            //w.LogILInstructions();
+            // going to before:
+            // orig.Invoke(self);
+            // by matching after this line:
+            // self.bouncedObjects.RemoveAt(self.bouncedObjects.Count - 1);
+            w.MatchRelaxed(
+                x => x.MatchLdcI4(1),
+                x => x.MatchSub(),
+                x => x.MatchCallvirt(out _) && w.SetCurrentTo(x),
+                x => x.MatchLdarg(1),
+                x => x.MatchLdarg(2)
+            ).ThrowIfFailure();
+            w.InsertAfterCurrent(w.Create(OpCodes.Ldarg_2));
+            w.MarkLabelToCurrent(skipDoublingProc);
+            w.InsertAfterCurrent(
+                w.CreateCall(DealDoubleDamage)
+            );
         }
         private static void DealDoubleDamage(LightningOrb lightningOrb)
         {

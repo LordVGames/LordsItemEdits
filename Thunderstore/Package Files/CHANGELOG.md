@@ -1,3 +1,12 @@
+## 0.3.4
+
+- Fixed for SS2 0.6.25
+
+## 0.3.3
+
+- Executive Card
+- - Prevents WolfFixes from setting the cooldown to 0 which replaced the cooldown my edit sets
+
 ## 0.3.2
 
 - All items

@@ -103,7 +103,12 @@ namespace LordsItemEdits.ItemEdits
             internal static void Setup()
             {
                 MultiShopCardUtils.Setup();
+                if (ModSupport.WolfFixes.WolfFixesMod.ModIsRunning)
+                {
+                    DontFixMyCooldownPlease.Setup();
+                }
             }
+
 
             [MonoDetourTargets(typeof(RoR2.Items.MultiShopCardUtils))]
             private static class MultiShopCardUtils
@@ -186,6 +191,42 @@ namespace LordsItemEdits.ItemEdits
                     {
                         characterBody.RemoveBuff(CreditScoreBuff.bdCreditScore);
                     }
+                }
+            }
+
+
+            [MonoDetourTargets(typeof(WolfoFixes.EquipmentFixes))]
+            private static class DontFixMyCooldownPlease
+            {
+                [MonoDetourHookInitialize]
+                internal static void Setup()
+                {
+                    MonoDetourHooks.WolfoFixes.EquipmentFixes.Start.ILHook(SkipSettingCooldownToZero);
+                }
+
+                private static void SkipSettingCooldownToZero(ILManipulationInfo info)
+                {
+                    ILWeaver w = new(info);
+                    ILLabel skipOverCooldownSetting = w.DefineLabel();
+
+                    // going before line:
+                    // Addressables.LoadAssetAsync<EquipmentDef>("f2ddbb7586240e648945ad494ebe3984").WaitForCompletion().cooldown = 0f;
+                    w.MatchRelaxed(
+                        x => x.MatchLdstr("f2ddbb7586240e648945ad494ebe3984") && w.SetCurrentTo(x)
+                    ).ThrowIfFailure()
+                    .InsertBeforeCurrent(
+                        w.Create(OpCodes.Br, skipOverCooldownSetting)
+                    );
+
+                    // going after same line above
+                    w.MatchRelaxed(
+                        x => x.MatchCall(out _),
+                        x => x.MatchLdcR4(0),
+                        x => x.MatchStfld<EquipmentDef>("cooldown") && w.SetCurrentTo(x)
+                    ).ThrowIfFailure()
+                    .MarkLabelToCurrentNext(skipOverCooldownSetting);
+
+                    //w.LogILInstructions();
                 }
             }
         }

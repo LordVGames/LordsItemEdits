@@ -9,20 +9,15 @@ namespace LordsItemEdits;
 [BepInDependency(RocketSurvivor.RocketSurvivorPlugin.MODUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(ModSupport.RiskyTweaksMod.RiskyTweaksMod.GUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(ModSupport.WolfFixes.WolfFixesMod.ModGUID, BepInDependency.DependencyFlags.SoftDependency)]
-[BepInPlugin(PluginGUID, PluginName, PluginVersion)]
-public class Plugin : BaseUnityPlugin
+[BepInAutoPlugin]
+public partial class Plugin : BaseUnityPlugin
 {
     public static PluginInfo PluginInfo { get; private set; }
-    public const string PluginGUID = PluginAuthor + "." + PluginName;
-    public const string PluginAuthor = "LordVGames";
-    public const string PluginName = "LordsItemEdits";
-    public const string PluginVersion = "0.6.0";
-
     public void Awake()
     {
         PluginInfo = Info;
         Log.Init(Logger);
-        ConfigOptions.BindConfigOptions(Config);
+        ConfigOptions.BindAllConfigOptions(Config);
         MonoDetourManager.InvokeHookInitializers(typeof(Plugin).Assembly, reportUnloadableTypes: false);
         ModLanguage.AddNewLangTokens();
     }

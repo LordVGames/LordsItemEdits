@@ -1,5 +1,6 @@
 {
   "strings": {
-    "ITEM_EXTRALIFEVOID_DESC": "<style=cIsUtility>Upon death</style>, this item will be <style=cIsUtility>consumed</style> and you will <style=cIsHealing>return to life</style> in a <style=cIsHealth>new body</style> that has <style=cIsHealth>-50% maximum health</style>. Return to your <style=cIsHealth>original body</style> in the next stage. <style=cIsVoid>Corrupts all Dio's Best Friends</style>."
+    "ITEM_EXTRALIFEVOID_PICKUP": "Gain an extra life in a <style=cIsVoid>new body</style>. Return to your <style=cIsHealth>original body</style> later. Consumed on use. <style=cIsVoid>Corrupts all Dio's Best Friends.</style>.",
+    "ITEM_EXTRALIFEVOID_DESC": "<style=cIsUtility>Upon death</style>, this item will be <style=cIsUtility>consumed</style> and you will <style=cIsHealing>return to life</style> with <style=cIsHealing>5 seconds of invulnerability</style> in a <style=cIsVoid>new body</style> that has <style=cIsHealth>-50% maximum health</style>. Return to your <style=cIsHealth>original body</style> in the next stage. <style=cIsVoid>Corrupts all Dio's Best Friends</style>."
   }
 }

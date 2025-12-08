@@ -11,6 +11,9 @@
 - Electric Boomerang
 - - Buffed damage a bit more
 
+- Pluripotent Larva
+- - Increased invulnerability time after respawn to help avoid your previous void life's void explosion if you have multiple plarvas
+
 ## 0.3.4
 
 - Fixed for SS2 0.6.25

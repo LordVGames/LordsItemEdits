@@ -64,6 +64,7 @@ internal static class VoidDios
         AssignMasterPrefabs();
         EditVoidBodyPrefabs();
         EditItemPrefabs();
+        // the method to pick a void guy to respawn as is still there, just unused
         Mdh.RoR2.Items.ExtraLifeVoidManager.GetNextBodyPrefab.ControlFlowPrefix(ExtraLifeVoidManager_GetNextBodyPrefab);
         Mdh.RoR2.CharacterMaster.RespawnExtraLifeVoid.ILHook(CharacterMaster_RespawnExtraLifeVoid);
         Mdh.RoR2.CharacterBody.Start.ControlFlowPrefix(CharacterBody_Start);
@@ -145,14 +146,14 @@ internal static class VoidDios
     {
         string[] voidBodyList = ["NullifierAllyBody", "VoidJailerAllyBody", "VoidMegaCrabAllyBody"];
         GameObject chosenBody = null;
-        if (ConfigOptions.VoidDios.AllowRespawnAsVoidReaver.Value)
+        
+        int listStartingIndex = 0;
+        if (!ConfigOptions.VoidDios.AllowRespawnAsVoidReaver.Value)
         {
-            chosenBody = BodyCatalog.FindBodyPrefab(voidBodyList[ExtraLifeVoidManager.rng.RangeInt(0, voidBodyList.Length)]);
+            listStartingIndex = 1;
         }
-        else
-        {
-            chosenBody = BodyCatalog.FindBodyPrefab(voidBodyList[ExtraLifeVoidManager.rng.RangeInt(1, voidBodyList.Length)]);
-        }
+        chosenBody = BodyCatalog.FindBodyPrefab(voidBodyList[ExtraLifeVoidManager.rng.RangeInt(listStartingIndex, voidBodyList.Length)]);
+
         returnValue = chosenBody;
         return ReturnFlow.SkipOriginal;
     }
@@ -174,14 +175,19 @@ internal static class VoidDios
             w.Create(OpCodes.Ldarg_0),
             w.CreateDelegateCall((CharacterMaster characterMaster) =>
             {
+                if (characterMaster == null || characterMaster.GetBody() == null)
+                {
+                    return;
+                }
+
                 if (!_lieVoidDiosInfoTable.TryGetValue(characterMaster, out _))
                 {
                     _lieVoidDiosInfoTable.Add(characterMaster, new LieVoidDiosInfo { OriginalBodyPrefab = characterMaster.bodyPrefab, NameOfSceneFirstRevivedIn = SceneManager.GetActiveScene().name });
-                    Log.Info($"Giving {characterMaster.GetBody()?.name} a CutHp due to them using up a void dios for the first time this stage");
+                    Log.Info($"Giving {characterMaster.GetBody().name} a CutHp due to them using up a void dios for the first time this stage");
                     characterMaster.inventory?.GiveItemPermanent(_cutHpItemDef.itemIndex);
                 }
 
-                GameObject voidAllyBodyPrefab = ExtraLifeVoidManager.GetNextBodyPrefab(); // the method to pick a void guy to respawn as is still there, just unused
+                GameObject voidAllyBodyPrefab = ExtraLifeVoidManager.GetNextBodyPrefab();
                 characterMaster.bodyPrefab = voidAllyBodyPrefab;
 
                 BaseAI originalBaseAI = characterMaster.GetComponent<BaseAI>();
@@ -190,9 +196,20 @@ internal static class VoidDios
                 {
                     ReplaceAISkillDrivers(characterMaster, originalBaseAI, voidAllyMasterPrefab); // fixes the ai being lobotomized since the ai doesn't change with their body
                 }
-
-                //return characterMaster;
             })
+        );
+
+        // going in middle of line:
+        // GetBody().AddTimedBuff(RoR2Content.Buffs.Immune, 3f);
+        w.MatchRelaxed(
+            x => x.MatchLdsfld("RoR2.RoR2Content/Buffs", "Immune"),
+            x => x.MatchLdcR4(3) && w.SetCurrentTo(x)
+        ).ThrowIfFailure()
+        .InsertAfterCurrent(
+            w.CreateDelegateCall((float oldInvulnerabilityTime) =>
+            {
+                return 5f;
+            })  
         );
 
 

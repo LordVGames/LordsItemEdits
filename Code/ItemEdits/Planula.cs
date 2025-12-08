@@ -1,4 +1,4 @@
-﻿using System;
+﻿/* using System;
 using System.Collections.Generic;
 using System.Text;
 using Mono.Cecil.Cil;
@@ -21,7 +21,7 @@ namespace LordsItemEdits.ItemEdits
             [MonoDetourHookInitialize]
             internal static void Setup()
             {
-                MonoDetourHooks.RoR2.HealthComponent.TakeDamageProcess.ILHook(DeleteVanillaEffect);
+                Mdh.RoR2.HealthComponent.TakeDamageProcess.ILHook(DeleteVanillaEffect);
             }
 
             // "member names cannot be the same as their enclosing type" ok fine!!!!!!!!!!
@@ -75,7 +75,7 @@ namespace LordsItemEdits.ItemEdits
             {
                 return;
             }
-            int planulaCount = damageReport.attackerBody.inventory.GetItemCount(RoR2Content.Items.ParentEgg);
+            int planulaCount = damageReport.attackerBody.inventory.GetItemCountEffective(RoR2Content.Items.ParentEgg);
             if (planulaCount < 1)
             {
                 return;
@@ -89,4 +89,4 @@ namespace LordsItemEdits.ItemEdits
 
         }
     }
-}
+} */

@@ -17,99 +17,95 @@ using MiscFixes.Modules;
 using R2API;
 using System.IO;
 using UnityEngine.Networking;
+namespace LordsItemEdits.ItemEdits;
 
-namespace LordsItemEdits.ItemEdits
+
+[MonoDetourTargets(typeof(GlobalEventManager))]
+internal static class MoltenPerforator
 {
-    internal static class MoltenPerforator
+    [MonoDetourHookInitialize]
+    internal static void Setup()
     {
-        private const float _golemRadius = 1.63f;
+        if (!ConfigOptions.MoltenPerforator.EnableEdit.Value)
+        {
+            return;
+        }
 
+        ModLanguage.LangFilesToLoad.Add("MoltenPerforator");
+        Assets.Setup();
+        Assets.LoadAssets();
+        Mdh.RoR2.GlobalEventManager.ProcessHitEnemy.ILHook(ILHook.ReplaceMerfFunctionality);
+    }
 
+    
+    private static class Assets
+    {
+        internal static AssetBundle MerfAssetBundle;
+        internal const string MerfAssetBundleName = "moltenperforator";
+        internal static string MerfAssetBundlePath
+        {
+            get
+            {
+                return System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Plugin.PluginInfo.Location), MerfAssetBundleName);
+            }
+        }
 
         internal static void Setup()
         {
-            if (!ConfigOptions.MoltenPerforator.EnableEdit.Value)
-            {
-                return;
-            }
-
-            ModLanguage.LangFilesToLoad.Add("MoltenPerforator");
-            Assets.Setup();
-            Assets.LoadAssets();
-            ILHook.Setup();
+            MerfAssetBundle = AssetBundle.LoadFromFile(MerfAssetBundlePath);
         }
 
 
-        
-        private static class Assets
+
+        internal static GameObject MerfExplosionPrefab;
+
+        internal static void LoadAssets()
         {
-            internal static AssetBundle MerfAssetBundle;
-            internal const string MerfAssetBundleName = "moltenperforator";
-            internal static string MerfAssetBundlePath
-            {
-                get
-                {
-                    return System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Plugin.PluginInfo.Location), MerfAssetBundleName);
-                }
-            }
-
-            internal static void Setup()
-            {
-                MerfAssetBundle = AssetBundle.LoadFromFile(MerfAssetBundlePath);
-            }
-
-
-
-            internal static GameObject MerfExplosionPrefab;
-
-            internal static void LoadAssets()
-            {
-                MerfExplosionPrefab = MerfAssetBundle.LoadAsset<GameObject>("MoltenPerforatorExplosionVFX");
-                ContentAddition.AddEffect(MerfExplosionPrefab);
-            }
+            MerfExplosionPrefab = MerfAssetBundle.LoadAsset<GameObject>("MoltenPerforatorExplosionVFX");
+            ContentAddition.AddEffect(MerfExplosionPrefab);
         }
+    }
 
-        private static class ILHook
+
+    private static class ILHook
+    {
+        private const float _golemRadius = 1.63f;
+
+        internal static void ReplaceMerfFunctionality(ILManipulationInfo info)
         {
-            [MonoDetourHookInitialize]
-            internal static void Setup()
-            {
-                MonoDetourHooks.RoR2.GlobalEventManager.ProcessHitEnemy.ILHook(ReplaceMerfFunctionality);
-            }
+            ILWeaver w = new(info);
+            Instruction startOfVanillaCode = null!;
+            ILLabel labelToEndOfVanillaCode = w.DefineLabel();
 
-            private static void ReplaceMerfFunctionality(ILManipulationInfo info)
-            {
-                ILWeaver w = new(info);
-                ILLabel skipVanillaEffect = w.DefineLabel();
+            // going in the middle of:
+            // if (itemCountEffective15 > 0 && !damageInfo.procChainMask.HasProc(ProcType.Meatball))
+            // to grab the location to exit merf code
+            w.MatchRelaxed(
+                x => x.MatchLdloc(23),
+                x => x.MatchLdcI4(0),
+                x => x.MatchBle(out labelToEndOfVanillaCode)
+            ).ThrowIfFailure();
 
-                // going in the middle of:
-                // if (itemCount12 > 0 && !damageInfo.procChainMask.HasProc(ProcType.Meatball))
-                // the grab the location to exit merf code
-                w.MatchRelaxed(
-                    x => x.MatchLdloc(20),
-                    x => x.MatchLdcI4(0),
-                    x => x.MatchBle(out skipVanillaEffect)
-                ).ThrowIfFailure();
-
-                // going before:
-                // InputBankTest component8 = characterBody.GetComponent<InputBankTest>();
-                // which is after the line matched for above
-                w.MatchRelaxed(
-                    x => x.MatchLdloc(0) && w.SetCurrentTo(x),
-                    x => x.MatchCallvirt<Component>("GetComponent"),
-                    x => x.MatchStloc(118)
-                ).ThrowIfFailure()
-                .InsertBeforeCurrentStealLabels(
-                    w.Create(OpCodes.Ldarg_1),
-                    w.Create(OpCodes.Ldarg_2),
-                    w.Create(OpCodes.Ldloc, 7),
-                    w.CreateCall(DoMoltenPerforatorExplosion),
-                    w.Create(OpCodes.Br, skipVanillaEffect)
-                );
-            }
+            // going before:
+            // InputBankTest component10 = characterBody.GetComponent<InputBankTest>();
+            // which is after the line matched for above
+            w.MatchRelaxed(
+                x => x.MatchLdloc(0) && w.SetCurrentTo(x) && w.SetInstructionTo(ref startOfVanillaCode, x),
+                x => x.MatchCallvirt<Component>("GetComponent"),
+                x => x.MatchStloc(129)
+            ).ThrowIfFailure()
+            .InsertBeforeCurrentStealLabels(
+                w.Create(OpCodes.Ldarg_1), // DamageInfo
+                w.Create(OpCodes.Ldarg_2), // victim
+                w.CreateCall(DoMoltenPerforatorExplosion),
+                w.Create(OpCodes.Br, labelToEndOfVanillaCode)
+            );
+            //w.LogILInstructions();
         }
 
-        private static void DoMoltenPerforatorExplosion(DamageInfo damageInfo, GameObject victim, CharacterMaster attackerMaster)
+
+
+        private static void DoMoltenPerforatorExplosion(DamageInfo damageInfo, GameObject victim)
         {
             if (victim == null || damageInfo.attacker == null)
             {
@@ -120,7 +116,7 @@ namespace LordsItemEdits.ItemEdits
             {
                 return;
             }
-            CharacterBody attackerBody = attackerMaster.GetBody();
+            CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
             if (attackerBody == null)
             {
                 return;
@@ -135,10 +131,9 @@ namespace LordsItemEdits.ItemEdits
             }
 
 
-            int merfCount = attackerBody.inventory.GetItemCount(RoR2Content.Items.FireballsOnHit);
-            float damageToDeal = Util.OnHitProcDamage(damageInfo.damage, attackerMaster.GetBody().damage, 2f + ((merfCount - 1) * 1.2f));
-            //float radiusMultFromVictimRadius = 1 + Math.Max(((victimBody.radius - _golemRadius) * 0.1f) * 0.8f, 0);
-            float radiusMultFromVictimRadius = 1 + (((victimBody.radius - _golemRadius) * 0.1f) * 0.8f);
+            int merfCount = attackerBody.inventory.GetItemCountEffective(RoR2Content.Items.FireballsOnHit);
+            float damageToDeal = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, 2f + ((merfCount - 1) * 1.2f));
+            float radiusMultFromVictimRadius = 1 + ((victimBody.radius - _golemRadius) * 0.08f * 0.8f);
 
 
             EffectData effectData = new()
@@ -159,7 +154,7 @@ namespace LordsItemEdits.ItemEdits
                 attackerFiltering = AttackerFiltering.Default,
                 falloffModel = BlastAttack.FalloffModel.None,
                 attacker = damageInfo.attacker,
-                teamIndex = attackerMaster.teamIndex,
+                teamIndex = attackerBody.teamComponent.teamIndex,
                 position = victim.transform.position,
                 inflictor = damageInfo.inflictor,
                 damageType = DamageType.IgniteOnHit
@@ -168,4 +163,5 @@ namespace LordsItemEdits.ItemEdits
             blastAttack.Fire();
         }
     }
+
 }

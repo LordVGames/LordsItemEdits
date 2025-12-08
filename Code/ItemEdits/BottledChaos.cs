@@ -8,48 +8,47 @@ using RoR2;
 using System;
 using System.Collections.Generic;
 using System.Text;
+namespace LordsItemEdits.ItemEdits;
 
-namespace LordsItemEdits.ItemEdits
+
+[MonoDetourTargets(typeof(Inventory))]
+internal static class BottledChaos
 {
-    [MonoDetourTargets(typeof(Inventory))]
-    internal static class BottledChaos
+    [MonoDetourHookInitialize]
+    internal static void Setup()
     {
-        [MonoDetourHookInitialize]
-        internal static void Setup()
+        if (!ConfigOptions.BottledChaos.EnableEdit.Value)
         {
-            if (!ConfigOptions.BottledChaos.EnableEdit.Value)
-            {
-                return;
-            }
-
-            ModLanguage.LangFilesToLoad.Add("BottledChaos");
-            MonoDetourHooks.RoR2.Inventory.CalculateEquipmentCooldownScale.ILHook(SetupBhaosCooldownReduction);
+            return;
         }
 
-        private static void SetupBhaosCooldownReduction(ILManipulationInfo info)
-        {
-            ILWeaver w = new(info);
+        ModLanguage.LangFilesToLoad.Add("BottledChaos");
+        Mdh.RoR2.Inventory.CalculateEquipmentCooldownScale.ILHook(SetupBhaosCooldownReduction);
+    }
 
-            // before "return num;"
-            w.MatchRelaxed(
-                x => x.MatchLdloc(3) && w.SetCurrentTo(x),
-                x => x.MatchRet()
-            ).ThrowIfFailure()
-            .InsertBeforeCurrentStealLabels(
-                w.Create(OpCodes.Ldarg_0),
-                w.Create(OpCodes.Ldloc_3),
-                w.CreateCall(AddBhaosCooldownReduction),
-                w.Create(OpCodes.Stloc_3)
-            );
-        }
+    private static void SetupBhaosCooldownReduction(ILManipulationInfo info)
+    {
+        ILWeaver w = new(info);
 
-        private static float AddBhaosCooldownReduction(Inventory inventory, float currentCooldownReduction)
+        // before "return num;"
+        w.MatchRelaxed(
+            x => x.MatchLdloc(3) && w.SetCurrentTo(x),
+            x => x.MatchRet()
+        ).ThrowIfFailure()
+        .InsertBeforeCurrentStealLabels(
+            w.Create(OpCodes.Ldarg_0),
+            w.Create(OpCodes.Ldloc_3),
+            w.CreateCall(AddBhaosCooldownReduction),
+            w.Create(OpCodes.Stloc_3)
+        );
+    }
+
+    private static float AddBhaosCooldownReduction(Inventory inventory, float currentCooldownReduction)
+    {
+        if (inventory.GetItemCountEffective(DLC1Content.Items.RandomEquipmentTrigger) > 0)
         {
-            if (inventory.GetItemCount(DLC1Content.Items.RandomEquipmentTrigger) > 0)
-            {
-                return currentCooldownReduction *= 0.65f;
-            }
-            return currentCooldownReduction;
+            return currentCooldownReduction *= 0.65f;
         }
+        return currentCooldownReduction;
     }
 }

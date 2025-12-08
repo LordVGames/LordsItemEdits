@@ -13,48 +13,47 @@ using LordsItemEdits.ItemEdits;
 using RoR2;
 using UnityEngine;
 using HarmonyLib;
+namespace LordsItemEdits.ModSupport.RiskyTweaksMod;
 
-namespace LordsItemEdits.ModSupport.RiskyTweaksMod
+
+[MonoDetourTargets(typeof(ScrapICBM), GenerateControlFlowVariants = true)]
+internal static class MulTScrapLauncherSynergyEdit
 {
-    [MonoDetourTargets(typeof(ScrapICBM), GenerateControlFlowVariants = true)]
-    internal static class MulTScrapLauncherSynergyEdit
+    [MonoDetourHookInitialize]
+    internal static void Setup()
     {
-        [MonoDetourHookInitialize]
-        internal static void Setup()
+        if (!ConfigOptions.PocketICBM.ChangeRiskyTweaksScrapLauncherEffect.Value)
         {
-            if (!ConfigOptions.PocketICBM.ChangeRiskyTweaksScrapLauncherEffect.Value)
-            {
-                return;
-            }
-
-            MonoDetourHooks.RiskyTweaks.Tweaks.Survivors.Toolbot.ScrapICBM.FireGrenadeLauncher_ModifyProjectileAimRay.ILHook(JustDoMyThing);
+            return;
         }
 
-        private static void JustDoMyThing(ILManipulationInfo info)
-        {
-            ILWeaver w = new(info);
-            ILLabel skipToOrig = w.DefineLabel();
-            //w.LogILInstructions();
+        Mdh.RiskyTweaks.Tweaks.Survivors.Toolbot.ScrapICBM.FireGrenadeLauncher_ModifyProjectileAimRay.ILHook(JustDoMyThing);
+    }
+
+    private static void JustDoMyThing(ILManipulationInfo info)
+    {
+        ILWeaver w = new(info);
+        ILLabel skipToOrig = w.DefineLabel();
+        //w.LogILInstructions();
 
 
-            w.InsertBeforeCurrent(
-                w.Create(OpCodes.Ldarg_2),
-                w.CreateCall(ChangeICBMSynergy),
-                w.Create(OpCodes.Br, skipToOrig)
-            );
+        w.InsertBeforeCurrent(
+            w.Create(OpCodes.Ldarg_2),
+            w.CreateCall(ChangeICBMSynergy),
+            w.Create(OpCodes.Br, skipToOrig)
+        );
 
 
-            w.MatchRelaxed(
-                x => x.MatchLdarg(1) && w.SetCurrentTo(x),
-                x => x.MatchLdarg(2),
-                x => x.MatchLdarg(3),
-                x => x.MatchCallvirt(out _)
-            ).ThrowIfFailure()
-            .MarkLabelToCurrentPrevious(skipToOrig);
-        }
-        private static void ChangeICBMSynergy(EntityStates.Toolbot.FireGrenadeLauncher fireGrenadeLauncherState)
-        {
-            fireGrenadeLauncherState.damageCoefficient *= PocketICBM.GetICBMDamageMult(fireGrenadeLauncherState.characterBody);
-        }
+        w.MatchRelaxed(
+            x => x.MatchLdarg(1) && w.SetCurrentTo(x),
+            x => x.MatchLdarg(2),
+            x => x.MatchLdarg(3),
+            x => x.MatchCallvirt(out _)
+        ).ThrowIfFailure()
+        .MarkLabelToCurrentPrevious(skipToOrig);
+    }
+    private static void ChangeICBMSynergy(EntityStates.Toolbot.FireGrenadeLauncher fireGrenadeLauncherState)
+    {
+        fireGrenadeLauncherState.damageCoefficient *= PocketICBM.GetICBMDamageMult(fireGrenadeLauncherState.characterBody);
     }
 }

@@ -9,24 +9,16 @@ using SimpleJSON;
 using System;
 using System.Collections.Generic;
 using System.Text;
+namespace LordsItemEdits;
 
-namespace LordsItemEdits
+
+internal static class ModUtil
 {
-    internal static class ModUtil
+    internal static void LogILInstructions(this ILWeaver iLWeaver)
     {
-        internal static void LogILError(ILContext il, ILCursor c)
+        foreach (var instruction in iLWeaver.Instructions)
         {
-            Log.Error($"COULD NOT IL HOOK {il.Method.Name}");
-            Log.Warning($"cursor is {c}");
-            Log.Warning($"il is {il}");
-        }
-
-        internal static void LogILInstructions(this ILWeaver iLWeaver)
-        {
-            foreach (var instruction in iLWeaver.Instructions)
-            {
-                Log.Warning(instruction);
-            }
+            Log.Warning(instruction);
         }
     }
 }

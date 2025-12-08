@@ -1,3 +1,16 @@
+## 0.4.0
+
+- Fixed for AC release
+- Removed SS2 item edits as they've been moved to LordsStarstormEdits
+- Ported what was still on MonoMod to MonoDetour
+
+- Molten Perforator
+- - Reduced light intensity on the Molten Perforator explosion effect
+- - Gave the molten perforator explosion a tiny increase in base size
+
+- Electric Boomerang
+- - Buffed damage a bit more
+
 ## 0.3.4
 
 - Fixed for SS2 0.6.25

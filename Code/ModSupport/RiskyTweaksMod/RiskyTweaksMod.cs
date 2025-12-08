@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+namespace LordsItemEdits.ModSupport.RiskyTweaksMod;
 
-namespace LordsItemEdits.ModSupport.RiskyTweaksMod
+
+internal static class RiskyTweaksMod
 {
-    internal static class RiskyTweaksMod
-    {
-        internal const string GUID = "com.Moffein.RiskyTweaks";
-        private static bool? _enabled;
+    internal const string GUID = "com.Moffein.RiskyTweaks";
+    private static bool? _enabled;
 
-        internal static bool ModIsRunning
+    internal static bool ModIsRunning
+    {
+        get
         {
-            get
-            {
-                _enabled ??= BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(GUID);
-                return (bool)_enabled;
-            }
+            _enabled ??= BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey(GUID);
+            return (bool)_enabled;
         }
     }
 }

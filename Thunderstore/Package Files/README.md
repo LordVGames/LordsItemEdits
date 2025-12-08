@@ -23,3 +23,7 @@ There's a bunch of items in RoR2 that are either underwhelming, aren't very fun/
 - Sticky Bomb
 - Lost Seers Lenses
 - More(?)
+
+## Starstorm 2 Item Edits
+
+I've edited some other items from Starstorm 2 as well, they can be found in [LordsStarstormEdits](https://thunderstore.io/package/LordVGames/LordsStarstormEdits/).

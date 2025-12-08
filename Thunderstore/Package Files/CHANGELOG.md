@@ -1,3 +1,7 @@
+## 0.4.1
+
+- Forgot to remove bit of SS2 support from mod description
+
 ## 0.4.0
 
 - Fixed for AC release

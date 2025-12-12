@@ -23,6 +23,9 @@ namespace LordsItemEdits.ItemEdits;
 [MonoDetourTargets(typeof(GlobalEventManager))]
 internal static class MoltenPerforator
 {
+    private const float _initialDamage = 2.5f;
+    private const float _stackDamage = 1.5f;
+
     [MonoDetourHookInitialize]
     internal static void Setup()
     {
@@ -83,16 +86,15 @@ internal static class MoltenPerforator
             w.MatchRelaxed(
                 x => x.MatchLdloc(23),
                 x => x.MatchLdcI4(0),
-                x => x.MatchBle(out labelToEndOfVanillaCode)
+                x => x.MatchBle(out labelToEndOfVanillaCode) && w.SetCurrentTo(x)
             ).ThrowIfFailure();
 
             // going before:
             // InputBankTest component10 = characterBody.GetComponent<InputBankTest>();
             // which is after the line matched for above
-            w.MatchRelaxed(
+            w.MatchNextRelaxed(
                 x => x.MatchLdloc(0) && w.SetCurrentTo(x) && w.SetInstructionTo(ref startOfVanillaCode, x),
-                x => x.MatchCallvirt<Component>("GetComponent"),
-                x => x.MatchStloc(129)
+                x => x.MatchCallvirt<Component>("GetComponent")
             ).ThrowIfFailure()
             .InsertBeforeCurrentStealLabels(
                 w.Create(OpCodes.Ldarg_1), // DamageInfo
@@ -117,11 +119,7 @@ internal static class MoltenPerforator
                 return;
             }
             CharacterBody attackerBody = damageInfo.attacker.GetComponent<CharacterBody>();
-            if (attackerBody == null)
-            {
-                return;
-            }
-            if (attackerBody.inventory == null)
+            if (attackerBody == null || attackerBody.inventory == null)
             {
                 return;
             }
@@ -132,7 +130,7 @@ internal static class MoltenPerforator
 
 
             int merfCount = attackerBody.inventory.GetItemCountEffective(RoR2Content.Items.FireballsOnHit);
-            float damageToDeal = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, 2f + ((merfCount - 1) * 1.2f));
+            float damageToDeal = Util.OnHitProcDamage(damageInfo.damage, attackerBody.damage, _initialDamage + ((merfCount - 1) * _stackDamage));
             float radiusMultFromVictimRadius = 1 + ((victimBody.radius - _golemRadius) * 0.08f * 0.8f);
 
 

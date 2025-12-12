@@ -30,36 +30,48 @@ internal class Polylute
     private static void SwapStackingHitsForDamage(ILManipulationInfo info)
     {
         ILWeaver w = new(info);
-        int damageValueVariableNumber = 79;
+        int voidLightningOrbVariableNumber = -1;
+        int polyluteItemCountVariableNumber = -1;
+
+        // grabbing item count from:
+        // int itemCountEffective9 = inventory.GetItemCountEffective(DLC1Content.Items.ChainLightningVoid);
+        w.MatchRelaxed(
+            x => x.MatchLdloc(out _),
+            x => x.MatchLdsfld("RoR2.DLC1Content/Items", "ChainLightningVoid"),
+            x => x.MatchCallOrCallvirt<Inventory>("GetItemCountEffective"),
+            x => x.MatchStloc(out polyluteItemCountVariableNumber)
+        ).ThrowIfFailure();
 
         // going to end of:
-        // float damageValue4 = Util.OnHitProcDamage(damageInfo.damage, characterBody.damage, damageCoefficient5);
+        // voidLightningOrb.damageValue = damageValue4;
         w.MatchRelaxed(
-            x => x.MatchLdloc(78),
-            x => x.MatchCall("RoR2.Util", "OnHitProcDamage"),
-            x => x.MatchStloc(damageValueVariableNumber) && w.SetCurrentTo(x)
+            x => x.MatchLdloc(out voidLightningOrbVariableNumber),
+            x => x.MatchLdloc(out _),
+            x => x.MatchStfld<VoidLightningOrb>("damageValue") && w.SetCurrentTo(x)
         ).ThrowIfFailure()
-        .InsertAfterCurrent(
-            w.Create(OpCodes.Ldloc, 76), // load item count (found near line matched to)
-            w.Create(OpCodes.Ldloc, damageValueVariableNumber), // load damage
-            w.CreateCall(DoDamageMult),
-            w.Create(OpCodes.Stloc, damageValueVariableNumber) // set damage again
+        .InsertBeforeCurrent(
+            w.Create(OpCodes.Ldloc, polyluteItemCountVariableNumber),
+            w.CreateDelegateCall((float damage, int polyluteCount) =>
+            {
+                return damage * polyluteCount;
+            })
         );
 
-
-        int voidLightningOrbVariableNumber = 80;
         // at the end of line:
         // voidLightningOrb.totalStrikes = 3 * itemCountEffective9;
         w.MatchRelaxed(
-            x => x.MatchLdloc(voidLightningOrbVariableNumber),
+            x => x.MatchLdloc(out voidLightningOrbVariableNumber),
             x => x.MatchLdcI4(3),
-            x => x.MatchLdloc(76),
+            x => x.MatchLdloc(out _),
             x => x.MatchMul(),
-            x => x.MatchStfld(out _) && w.SetCurrentTo(x)
+            x => x.MatchStfld<VoidLightningOrb>("totalStrikes") && w.SetCurrentTo(x)
         ).ThrowIfFailure()
         .InsertAfterCurrent(
             w.Create(OpCodes.Ldloc, voidLightningOrbVariableNumber), // load VoidLightningOrb
-            w.CreateCall(ResetVoidLightningOrbStrikeCount)
+            w.CreateDelegateCall((VoidLightningOrb voidLightningOrb) =>
+            {
+                voidLightningOrb.totalStrikes = 3;
+            })
         );
         
         //w.LogILInstructions();

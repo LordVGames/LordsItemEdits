@@ -25,14 +25,14 @@ internal static class ElectricBoomerang
 {
     private const float _damagePerHit = 3.75f;
     private const float _damagePerHitStack = 2.75f;
+    private const int _maximumBoomerangCount = 2;
     private static readonly AssetReferenceT<GameObject> _electricBoomerangProjectileAsset = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC2_Items_StunAndPierce.StunAndPierceBoomerang_prefab);
     private static readonly AssetReferenceT<ItemDef> _electricBoomerangItemDef = new(RoR2BepInExPack.GameAssetPathsBetter.RoR2_DLC2_Items_StunAndPierce.StunAndPierce_asset);
     private static readonly FixedConditionalWeakTable<GameObject, LieElectricBoomerangInfo> _lieElectricBoomerangInfoTable = [];
     private class LieElectricBoomerangInfo
     {
-        internal bool HasBoomerangOut;
+        internal int ExistingBoomerangProjectileCount;
     }
-
 
 
     [MonoDetourHookInitialize]
@@ -48,8 +48,9 @@ internal static class ElectricBoomerang
         AIBlacklistNewBoomerang();
         Mdh.RoR2.GlobalEventManager.ProcessHitEnemy.Postfix(GlobalEventManager_ProcessHitEnemy);
         Mdh.RoR2.GlobalEventManager.ProcessHitEnemy.ILHook(MakeBoomerangBetter);
-        Mdh.RoR2.Projectile.BoomerangProjectile.FixedUpdate.ILHook(InsertRemoveProjectileOwnerFromFiredList);
+        Mdh.RoR2.Projectile.BoomerangProjectile.FixedUpdate.ILHook(SetupRemoveOneFromExistingBoomerangCount);
     }
+
 
     private static void GlobalEventManager_ProcessHitEnemy(GlobalEventManager self, ref DamageInfo damageInfo, ref GameObject victim)
     {
@@ -68,7 +69,6 @@ internal static class ElectricBoomerang
     }
 
 
-
     private static void EditBoomerangProjectile()
     {
         AssetAsyncReferenceManager<GameObject>.LoadAsset(_electricBoomerangProjectileAsset).Completed += (handle) =>
@@ -85,7 +85,6 @@ internal static class ElectricBoomerang
     }
 
 
-
     private static void AIBlacklistNewBoomerang()
     {
         AssetAsyncReferenceManager<ItemDef>.LoadAsset(_electricBoomerangItemDef).Completed += (handle) =>
@@ -98,115 +97,132 @@ internal static class ElectricBoomerang
     }
 
 
-
     private static void MakeBoomerangBetter(ILManipulationInfo info)
     {
         ILWeaver w = new(info);
-        ILLabel skipElectricBoomerangCode = w.DefineLabel();
-        ILLabel skipOldInitialCheck = w.DefineLabel();
-        ILLabel skipOldDamageSet = w.DefineLabel();
-        int electricBoomerangEffectiveCountVariableNumber = 0;
-        int setDamageVariableNumber = 0;
 
-        // going before:
-        // if (itemCountEffective20 > 0 && !damageInfo.procChainMask.HasProc(ProcType.StunAndPierceDamage) && (ulong)(damageInfo.damageType & DamageTypeExtended.Electrocution) == 0L && LocalCheckRoll(15f * damageInfo.procCoefficient, master2))
+
+        int electricBoomerangEffectiveCountVariableNumber = 0;
+        // matching to:
+        // int itemCountEffective20 = inventory.GetItemCountEffective(DLC2Content.Items.StunAndPierce);
         w.MatchRelaxed(
+            x => x.MatchLdloc(out _),
             x => x.MatchLdsfld("RoR2.DLC2Content/Items", "StunAndPierce"),
             x => x.MatchCallOrCallvirt<Inventory>("GetItemCountEffective"),
-            x => x.MatchStloc(out _),
-            x => x.MatchLdloc(out electricBoomerangEffectiveCountVariableNumber) && w.SetCurrentTo(x),
-            x => x.MatchLdcI4(0),
-            x => x.MatchBle(out skipElectricBoomerangCode)
+            x => x.MatchStloc(out electricBoomerangEffectiveCountVariableNumber)
+        ).ThrowIfFailure();
+
+
+        ILLabel skipVanillaElectricBoomerangCode = w.DefineLabel();
+        // going near end of:
+        // if (itemCountEffective20 > 0 && !damageInfo.procChainMask.HasProc(ProcType.StunAndPierceDamage) && (ulong)(damageInfo.damageType & DamageTypeExtended.Electrocution) == 0L && LocalCheckRoll(15f * damageInfo.procCoefficient, master2))
+        w.MatchRelaxed(
+            x => x.MatchLdcI4(512),
+            x => x.MatchCallOrCallvirt(out _),
+            x => x.MatchCallOrCallvirt(out _),
+            x => x.MatchCallOrCallvirt(out _),
+            x => x.MatchBrtrue(out skipVanillaElectricBoomerangCode) && w.SetCurrentTo(x),
+            x => x.MatchLdcR4(15f)
         ).ThrowIfFailure()
-        .InsertBeforeCurrent(
-            w.Create(OpCodes.Ldarg_1), // load damageinfo
-            w.Create(OpCodes.Ldloc, 24), // load electric boomerang count
+        .InsertAfterCurrent(
+            w.Create(OpCodes.Ldarg_1), // DamageInfo
             w.CreateCall(ShouldAllowNewElectricBoomerang),
-            w.Create(OpCodes.Brfalse, skipElectricBoomerangCode),
-            w.Create(OpCodes.Br, skipOldInitialCheck)
+            w.Create(OpCodes.Brfalse, skipVanillaElectricBoomerangCode),
+            w.Create(OpCodes.Ldloc_0), // CharacterBody
+            w.CreateCall(TryAddOneToExistingBoomerangProjectileCount)
         );
 
 
+        int setDamageVariableNumber = 0;
         // going to end of line:
         // float damage6 = characterBody.damage * 0.4f * (float)itemCountEffective20;
-        w.MatchRelaxed(
-            x => x.MatchLdcR4(15),
-            x => x.MatchLdarg(1),
-            x => x.MatchLdfld<DamageInfo>("procCoefficient"),
+        w.MatchNextRelaxed(
+            x => x.MatchLdloc(0),
+            x => x.MatchCallOrCallvirt<CharacterBody>("get_damage"),
+            x => x.MatchLdcR4(0.4f),
             x => x.MatchMul(),
             x => x.MatchLdloc(out _),
-            x => x.MatchLdloca(out _),
-            x => x.MatchCallOrCallvirt(out _),
-            x => x.MatchBrfalse(out _) && w.SetCurrentTo(x)
-        ).ThrowIfFailure()
-        .MarkLabelToCurrentNext(skipOldInitialCheck)
-        .CurrentToNext()
-        .InsertBeforeCurrentStealLabels(
-            w.Create(OpCodes.Ldarg_1), // load damageinfo
-            w.Create(OpCodes.Ldloc, electricBoomerangEffectiveCountVariableNumber), // load electric boomerang count
-            w.CreateCall(GetNewDamageValue),
-            w.Create(OpCodes.Stloc, setDamageVariableNumber),
-            w.Create(OpCodes.Ldloc_0), // load characterbody
-            w.CreateCall(TryAddCharacterBodyToFiredBoomerangsList),
-            w.Create(OpCodes.Br, skipOldDamageSet)
-        );
-
-
-        // going to end of line above
-        w.MatchRelaxed(
-            x => x.MatchLdloc(27),
             x => x.MatchConvR4(),
             x => x.MatchMul(),
             x => x.MatchStloc(out setDamageVariableNumber) && w.SetCurrentTo(x)
         ).ThrowIfFailure()
-        .MarkLabelToCurrentNext(skipOldDamageSet);
-
+        .InsertBeforeCurrent(
+            w.Create(OpCodes.Ldloc, electricBoomerangEffectiveCountVariableNumber),
+            w.Create(OpCodes.Ldarg_1), // DamageInfo
+            w.CreateDelegateCall((float oldDamage, int electricBoomerangEffectiveCount, DamageInfo damageInfo) =>
+            {
+                return damageInfo.damage * (_damagePerHit + (_damagePerHitStack * (electricBoomerangEffectiveCount - 1)));
+            })
+        );
 
         //w.LogILInstructions();
     }
 
-    private static bool ShouldAllowNewElectricBoomerang(DamageInfo damageInfo, int electricBoomerangCount)
+    private static bool ShouldAllowNewElectricBoomerang(DamageInfo damageInfo)
     {
-        return electricBoomerangCount < 1 && !damageInfo.procChainMask.HasProc(ProcType.StunAndPierceDamage) && damageInfo.damageType.IsDamageSourceSkillBased && damageInfo.damageType.damageType.HasFlag(DamageType.Stun1s) && !_lieElectricBoomerangInfoTable.ContainsKey(damageInfo.attacker);
-    }
-
-    private static float GetNewDamageValue(DamageInfo damageInfo, int electricBoomerangCount)
-    {
-        return damageInfo.damage * (_damagePerHit + (_damagePerHitStack * (electricBoomerangCount - 1)));
-    }
-
-    private static void TryAddCharacterBodyToFiredBoomerangsList(CharacterBody characterBody)
-    {
-        if (NetworkServer.active && !_lieElectricBoomerangInfoTable.ContainsKey(characterBody.gameObject))
+        int existingBoomerangProjectileCount = 0;
+        if (_lieElectricBoomerangInfoTable.TryGetValue(damageInfo.attacker.gameObject, out var currentLieElectricBoomerangInfo))
         {
-            _lieElectricBoomerangInfoTable.Add(characterBody.gameObject, new LieElectricBoomerangInfo { HasBoomerangOut = true });
+            existingBoomerangProjectileCount = currentLieElectricBoomerangInfo.ExistingBoomerangProjectileCount;
+        }
+        
+        //Log.Warning($"damageInfo.damageType.IsDamageSourceSkillBased is {damageInfo.damageType.IsDamageSourceSkillBased}");
+        //Log.Warning($"damageInfo.damageType.damageType.HasFlag(DamageType.Stun1s) is {damageInfo.damageType.damageType.HasFlag(DamageType.Stun1s)}");
+        //Log.Warning($"existingBoomerangProjectileCount < _maximumBoomerangCount is {existingBoomerangProjectileCount < _maximumBoomerangCount}");
+        //Log.Warning("");
+
+        return damageInfo.damageType.IsDamageSourceSkillBased
+        && damageInfo.damageType.damageType.HasFlag(DamageType.Stun1s)
+        && existingBoomerangProjectileCount < _maximumBoomerangCount;
+    }
+
+
+    private static void TryAddOneToExistingBoomerangProjectileCount(CharacterBody characterBody)
+    {
+        if (!NetworkServer.active)
+        {
+            return;
+        }
+
+        if (_lieElectricBoomerangInfoTable.TryGetValue(characterBody.gameObject, out var currentLieElectricBoomerangInfo)
+            && currentLieElectricBoomerangInfo.ExistingBoomerangProjectileCount < _maximumBoomerangCount)
+        {
+            currentLieElectricBoomerangInfo.ExistingBoomerangProjectileCount += 1;
+        }
+        else
+        {
+            _lieElectricBoomerangInfoTable.Add(characterBody.gameObject, new LieElectricBoomerangInfo { ExistingBoomerangProjectileCount = 1 });
         }
     }
 
 
-
-    private static void InsertRemoveProjectileOwnerFromFiredList(ILManipulationInfo info)
+    private static void SetupRemoveOneFromExistingBoomerangCount(ILManipulationInfo info)
     {
         ILWeaver w = new(info);
 
         w.MatchMultipleRelaxed(
-            onMatch: mW =>
+            onMatch: (Action<ILWeaver>)(mW =>
             {
                 mW.InsertAfterCurrent(
                     mW.Create(OpCodes.Ldarg_0),
-                    mW.CreateCall(TryRemoveProjectileOwnerFromFiredList)
+                    mW.CreateCall((Delegate)TryRemoveOneFromExistingBoomerangCount)
                 );
-            },
+            }),
             x => x.MatchCall("UnityEngine.Object", "Destroy") && w.SetCurrentTo(x)
         )
         .ThrowIfFailure();
     }
-    
-    private static void TryRemoveProjectileOwnerFromFiredList(BoomerangProjectile boomerangProjectile)
+
+
+    private static void TryRemoveOneFromExistingBoomerangCount(BoomerangProjectile boomerangProjectile)
     {
-        if (NetworkServer.active && _lieElectricBoomerangInfoTable.ContainsKey(boomerangProjectile.projectileController.owner))
+        if (NetworkServer.active && _lieElectricBoomerangInfoTable.TryGetValue(boomerangProjectile.projectileController.owner, out var currentLieElectricBoomerangInfo))
         {
-            _lieElectricBoomerangInfoTable.Remove(boomerangProjectile.projectileController.owner);
+            currentLieElectricBoomerangInfo.ExistingBoomerangProjectileCount -= 1;
+            if (currentLieElectricBoomerangInfo.ExistingBoomerangProjectileCount < 1)
+            {
+                _lieElectricBoomerangInfoTable.Remove(boomerangProjectile.projectileController.owner);
+            }
         }
     }
 }

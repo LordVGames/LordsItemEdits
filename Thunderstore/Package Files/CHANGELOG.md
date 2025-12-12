@@ -1,3 +1,18 @@
+## 0.4.2
+
+- Fixed for AC patch 1
+
+- Molten Perforator
+- - Boosted damage some
+- - (200% > 250% and 120% per stack > 150%)
+
+- Electric Boomerang
+- - Now can have up to 2 boomerangs out at once
+- - - This is to give stunning skills that do a bunch of hits more value with this item.
+- - Fixed projectile not doing damage
+- - (Hopefully) Fixed electric boomerang always being able to fire
+- - - I think this is because the mod doesn't load right in certain packs, but I haven't gotten a log for it so maybe the internal changes I've done will help it
+
 ## 0.4.1
 
 - Forgot to remove bit of SS2 support from mod description

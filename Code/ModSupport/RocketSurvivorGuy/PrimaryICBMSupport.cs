@@ -9,7 +9,7 @@ using MonoDetour.Cil;
 using UnityEngine;
 using RoR2;
 using RoR2.Orbs;
-using LordsItemEdits.ItemEdits;
+using LordsItemEdits.ItemEdits.PocketICBMEdit;
 namespace LordsItemEdits.ModSupport.RocketSurvivorGuy;
 
 
@@ -58,6 +58,6 @@ internal static class PrimaryICBMSupport
 
     private static float ChangeDamageBasedOnICBM(float damage, EntityStates.EntityState entityState)
     {
-        return damage * PocketICBM.GetICBMDamageMult(entityState.characterBody);
+        return damage * PocketICBM.GetICBMDamageMultForCharacterBody(entityState.characterBody);
     }
 }

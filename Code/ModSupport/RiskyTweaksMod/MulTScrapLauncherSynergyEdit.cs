@@ -9,10 +9,10 @@ using MonoDetour.HookGen;
 using MonoDetour.Logging;
 using MonoMod.Cil;
 using RiskyTweaks.Tweaks.Survivors.Toolbot;
-using LordsItemEdits.ItemEdits;
 using RoR2;
 using UnityEngine;
 using HarmonyLib;
+using LordsItemEdits.ItemEdits.PocketICBMEdit;
 namespace LordsItemEdits.ModSupport.RiskyTweaksMod;
 
 
@@ -54,6 +54,6 @@ internal static class MulTScrapLauncherSynergyEdit
     }
     private static void ChangeICBMSynergy(EntityStates.Toolbot.FireGrenadeLauncher fireGrenadeLauncherState)
     {
-        fireGrenadeLauncherState.damageCoefficient *= PocketICBM.GetICBMDamageMult(fireGrenadeLauncherState.characterBody);
+        fireGrenadeLauncherState.damageCoefficient *= PocketICBM.GetICBMDamageMultForCharacterBody(fireGrenadeLauncherState.characterBody);
     }
 }

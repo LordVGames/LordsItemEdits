@@ -42,8 +42,6 @@
 		  <PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 
-		<PackageReference Include="LordVGames-DamageSourceForEnemies" Version="2.0.1" />
-
 		<PackageReference Include="MMHOOK.RoR2" Version="2025.12.9" />
 
 		<PackageReference Include="MonoDetour" Version="0.7.8" />

@@ -1,6 +1,6 @@
 {
   "strings": {
-    "ITEM_STUNANDPIERCE_PICKUP": "Throw up to 2 stunning boomerangs on hit with a skill that can stun.",
-    "ITEM_STUNANDPIERCE_DESC": "On hit with a skill that can stun, throw an electric boomerang that slices through enemies <style=cIsUtility>stunning</style> and dealing <style=cIsDamage>375% <style=cStack>(+275% per stack)</style></style> TOTAL damage every hit. <style=cSub>The boomerang can hit an enemy multiple times. Can only have 2 boomerangs out at once.</style>"
+    "ITEM_STUNANDPIERCE_PICKUP": "Throw up to 2 electric boomerangs on hit with a skill that can stun.",
+    "ITEM_STUNANDPIERCE_DESC": "On hit with <style=cIsUtility>a skill that can stun</style>, throw an electric boomerang that slices through enemies <style=cIsUtility>stunning</style> and dealing <style=cIsDamage>375% <style=cStack>(+275% per stack)</style></style> TOTAL damage every hit. <style=cSub>The boomerang can hit an enemy multiple times. Can have up to 2 boomerangs out at once.</style>"
   }
 }
